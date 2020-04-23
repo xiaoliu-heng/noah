@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bg"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/canvas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="主图片" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="80dp"
+        android:layout_marginEnd="10dp"
+        app:srcCompat="@drawable/icon_save"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="145dp"
+        android:layout_marginEnd="10dp"
+        app:srcCompat="@drawable/icon_switch" />
+
+    <ProgressBar
+        android:id="@+id/saving"
+        android:indeterminate="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="80dp"
+        android:layout_marginEnd="10dp"
+        app:layout_anchor="@id/fab_save"
+        app:layout_anchorGravity="center"
+        />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/efab_transparent"
+        app:icon="@drawable/icon_unchecked"
+        android:text="@string/btn_transparent"
+        android:shadowColor="@color/colorAccent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        app:strokeWidth="2dp"
+        app:strokeColor="@color/gray"
+        android:layout_gravity="bottom|start"
+        android:layout_marginBottom="25dp"
+        android:layout_marginStart="10dp"/>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/efab_black"
+        app:icon="@drawable/icon_unchecked"
+        android:text="黑色"
+        android:shadowColor="@color/colorAccent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        app:strokeWidth="2dp"
+        app:strokeColor="@color/gray"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="25dp"/>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/efab_white"
+        app:icon="@drawable/icon_unchecked"
+        android:text="白色"
+        android:shadowColor="@color/colorAccent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        app:strokeWidth="2dp"
+        app:strokeColor="@color/gray"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="25dp"
+        android:layout_marginEnd="10dp"/>
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+

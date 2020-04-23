@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name" translatable="false">诺亚</string>
+    <string name="btn_transparent">透明</string>
+</resources>
