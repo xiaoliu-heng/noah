@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
@@ -34,6 +36,7 @@ import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import lombok.val;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -44,14 +47,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Bitmap tnt;
     ImageView iv;
     ProgressBar saving;
-    FloatingActionButton fab_switch, fab_save;
+    FloatingActionButton fab_save;
     ExtendedFloatingActionButton efab_transparent, efab_white, efab_black;
     BitmapFactory.Options options;
-    String current = "t3";
-    int currentBgColor = Color.parseColor("#242424");
-    int BgBlack = Color.parseColor("#242424");
-    int BgWhite = Color.parseColor("#E6E6E6");
-
 
     private CompositeDisposable disposable = new CompositeDisposable();
 
@@ -72,11 +70,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d(TAG, "收到图片文件");
                 Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
                 if (imageUri != null) {
-                    // Update UI to reflect image being shared
+                    setBitmapFromUri(imageUri);
                 }
             }
         }
+
         init();
+        initBg();
+
         model.result.observe(this, r -> {
             Log.d(TAG, "onCreate: set image from viewModel");
 
@@ -93,14 +94,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         coordinatorLayout = findViewById(R.id.bg);
 
         saving.setVisibility(View.INVISIBLE);
-        fab_switch = findViewById(R.id.fab_switch);
         fab_save = findViewById(R.id.fab_save);
         efab_transparent = findViewById(R.id.efab_transparent);
         efab_black = findViewById(R.id.efab_black);
         efab_white = findViewById(R.id.efab_white);
 
         iv.setOnClickListener(this);
-        fab_switch.setOnClickListener(this);
         fab_save.setOnClickListener(this);
         efab_transparent.setOnClickListener(this);
         efab_black.setOnClickListener(this);
@@ -134,10 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void setBitmapFromUri(Uri uri) {
         try {
             Bitmap bitmap = getBitmapFromUri(uri);
-            Single.create((SingleOnSubscribe<String>) emitter -> {
-                model.setTwo(bitmap);
-                emitter.onSuccess("ok");
-            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
+            model.setTwo(bitmap);
         } catch (IOException e) {
             Log.d(TAG, "setBitmapFromUri: read image from uri failed");
         }
@@ -183,31 +179,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .subscribe();
     }
 
-    public void switchFrame() {
-        if (current.equals("t3")) {
-            current = "tnt";
-            model.setFrame(MainActivityViewModel.FRAME_TNT);
-        } else {
-            current = "t3";
-            model.setFrame(MainActivityViewModel.FRAME_T3);
-        }
+    public void setBgColor(int color){
+        model.setBgColor(color);
     }
 
-    public void switchBg(int color) {
-        model.setCurrentBgColor(color);
-        if (currentBgColor == Color.TRANSPARENT) {
-            efab_transparent.setIcon(getDrawable(R.drawable.icon_check));
-            efab_white.setIcon(getDrawable(R.drawable.icon_unchecked));
-            efab_black.setIcon(getDrawable(R.drawable.icon_unchecked));
-        } else if (currentBgColor == BgBlack) {
-            efab_transparent.setIcon(getDrawable(R.drawable.icon_unchecked));
-            efab_white.setIcon(getDrawable(R.drawable.icon_unchecked));
-            efab_black.setIcon(getDrawable(R.drawable.icon_check));
-        } else if (currentBgColor == BgWhite) {
-            efab_transparent.setIcon(getDrawable(R.drawable.icon_unchecked));
-            efab_white.setIcon(getDrawable(R.drawable.icon_check));
-            efab_black.setIcon(getDrawable(R.drawable.icon_unchecked));
-        }
+    public void initBg() {
+        model.bgColor.observe(this, c -> {
+            if (c == BackgroundColor.Transparent) {
+                efab_transparent.setIcon(getDrawable(R.drawable.icon_check));
+                efab_white.setIcon(getDrawable(R.drawable.icon_unchecked));
+                efab_black.setIcon(getDrawable(R.drawable.icon_unchecked));
+            } else if (c == BackgroundColor.Black) {
+                efab_transparent.setIcon(getDrawable(R.drawable.icon_unchecked));
+                efab_white.setIcon(getDrawable(R.drawable.icon_unchecked));
+                efab_black.setIcon(getDrawable(R.drawable.icon_check));
+            } else if (c == BackgroundColor.White) {
+                efab_transparent.setIcon(getDrawable(R.drawable.icon_unchecked));
+                efab_white.setIcon(getDrawable(R.drawable.icon_check));
+                efab_black.setIcon(getDrawable(R.drawable.icon_unchecked));
+            }
+        });
     }
 
     @Override
@@ -219,21 +210,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.fab_save:
                 saveImg();
                 break;
-            case R.id.fab_switch:
-                switchFrame();
-                break;
             case R.id.efab_transparent:
-                currentBgColor = Color.TRANSPARENT;
-                switchBg(Color.TRANSPARENT);
+                setBgColor(BackgroundColor.Transparent);
                 break;
             case R.id.efab_white:
-                currentBgColor = BgWhite;
-                Log.d(TAG, "onClick: efab_white");
-                switchBg(BgWhite);
+                setBgColor(BackgroundColor.White);
                 break;
             case R.id.efab_black:
-                currentBgColor = BgBlack;
-                switchBg(BgBlack);
+                setBgColor(BackgroundColor.Black);
                 break;
             default:
                 break;

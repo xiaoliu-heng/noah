@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">诺亚</string>
     <string name="btn_transparent">透明</string>
+    <string name="bg_black_text">黑色</string>
+    <string name="bg_white_text">白色</string>
+    <string name="content_image_desc">主图片</string>
 </resources>

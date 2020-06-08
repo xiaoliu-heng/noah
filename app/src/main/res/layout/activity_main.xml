@@ -11,79 +11,68 @@
         android:id="@+id/canvas"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:contentDescription="主图片" />
+        android:contentDescription="@string/content_image_desc" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
+        android:layout_marginEnd="10dp"
         android:layout_marginBottom="80dp"
-        android:layout_marginEnd="10dp"
-        app:srcCompat="@drawable/icon_save"
-        />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_switch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginBottom="145dp"
-        android:layout_marginEnd="10dp"
-        app:srcCompat="@drawable/icon_switch" />
+        app:srcCompat="@drawable/icon_save" />
 
     <ProgressBar
         android:id="@+id/saving"
-        android:indeterminate="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginBottom="80dp"
         android:layout_marginEnd="10dp"
+        android:layout_marginBottom="80dp"
+        android:indeterminate="true"
         app:layout_anchor="@id/fab_save"
-        app:layout_anchorGravity="center"
-        />
+        app:layout_anchorGravity="center" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/efab_transparent"
-        app:icon="@drawable/icon_unchecked"
-        android:text="@string/btn_transparent"
-        android:shadowColor="@color/colorAccent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/white"
-        app:strokeWidth="2dp"
-        app:strokeColor="@color/gray"
         android:layout_gravity="bottom|start"
+        android:layout_marginStart="10dp"
         android:layout_marginBottom="25dp"
-        android:layout_marginStart="10dp"/>
+        android:backgroundTint="@color/white"
+        android:shadowColor="@color/colorAccent"
+        android:text="@string/btn_transparent"
+        app:icon="@drawable/icon_unchecked"
+        app:strokeColor="@color/gray"
+        app:strokeWidth="2dp" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/efab_black"
-        app:icon="@drawable/icon_unchecked"
-        android:text="黑色"
-        android:shadowColor="@color/colorAccent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/white"
-        app:strokeWidth="2dp"
-        app:strokeColor="@color/gray"
         android:layout_gravity="bottom|center"
-        android:layout_marginBottom="25dp"/>
+        android:layout_marginBottom="25dp"
+        android:backgroundTint="@color/white"
+        android:shadowColor="@color/colorAccent"
+        android:text="@string/bg_black_text"
+        app:icon="@drawable/icon_unchecked"
+        app:strokeColor="@color/gray"
+        app:strokeWidth="2dp" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/efab_white"
-        app:icon="@drawable/icon_unchecked"
-        android:text="白色"
-        android:shadowColor="@color/colorAccent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/white"
-        app:strokeWidth="2dp"
-        app:strokeColor="@color/gray"
         android:layout_gravity="bottom|end"
+        android:layout_marginEnd="10dp"
         android:layout_marginBottom="25dp"
-        android:layout_marginEnd="10dp"/>
+        android:backgroundTint="@color/white"
+        android:shadowColor="@color/colorAccent"
+        android:text="@string/bg_white_text"
+        app:icon="@drawable/icon_unchecked"
+        app:strokeColor="@color/gray"
+        app:strokeWidth="2dp" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
