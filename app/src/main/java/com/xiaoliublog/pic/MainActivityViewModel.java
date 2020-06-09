@@ -41,8 +41,8 @@ public class MainActivityViewModel extends AndroidViewModel {
         result.postValue(_t3);
     }
 
-    private void reRender() {
-        Log.d(TAG, "reRender: ");
+    public void reRender() {
+        Log.d(TAG, "reRender: " + bgColor.getValue());
         val imageComposeBuilder = ImageCombiner.builder();
         imageComposeBuilder.bgColor(bgColor.getValue() == null ? BackgroundColor.Transparent : bgColor.getValue());
         imageComposeBuilder.width(1826).height(3252);
@@ -59,13 +59,14 @@ public class MainActivityViewModel extends AndroidViewModel {
         result.postValue(imageComposeBuilder.build().combine());
     }
 
-    public void setBgColor(int color){
-        bgColor.postValue(color);
+    public void setBgColor(int color) {
+        Log.d(TAG, "setBgColor: " + color);
+        bgColor.setValue(color);
         reRender();
     }
 
     public void setTwo(Bitmap bitmap) {
-        two.postValue(bitmap);
+        two.setValue(bitmap);
         reRender();
     }
 

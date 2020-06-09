@@ -16,7 +16,7 @@ public class ImageCombiner {
     @Builder.Default private final Canvas canvas = new Canvas();
     @Builder.Default private Paint paint = new Paint();
     @Singular("add")
-    private List<ImageWithPosition> images = new ArrayList<>();
+    private List<ImageWithPosition> images;
 
     private int width, height;
     private int bgColor;

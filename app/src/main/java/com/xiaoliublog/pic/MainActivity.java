@@ -184,15 +184,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void initBg() {
+        val icon_check = getDrawable(R.drawable.icon_check);
+        val icon_uncheck = getDrawable(R.drawable.icon_unchecked);
         model.bgColor.observe(this, c -> {
             if (c == BackgroundColor.Transparent) {
-                efab_transparent.setIcon(getDrawable(R.drawable.icon_check));
-                efab_white.setIcon(getDrawable(R.drawable.icon_unchecked));
-                efab_black.setIcon(getDrawable(R.drawable.icon_unchecked));
+                efab_transparent.setIcon(icon_check);
+                efab_white.setIcon(icon_uncheck);
+                efab_black.setIcon(icon_uncheck);
             } else if (c == BackgroundColor.Black) {
-                efab_transparent.setIcon(getDrawable(R.drawable.icon_unchecked));
-                efab_white.setIcon(getDrawable(R.drawable.icon_unchecked));
-                efab_black.setIcon(getDrawable(R.drawable.icon_check));
+                efab_transparent.setIcon(icon_uncheck);
+                efab_white.setIcon(icon_uncheck);
+                efab_black.setIcon(icon_check);
             } else if (c == BackgroundColor.White) {
                 efab_transparent.setIcon(getDrawable(R.drawable.icon_unchecked));
                 efab_white.setIcon(getDrawable(R.drawable.icon_check));
