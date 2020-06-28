@@ -1,79 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/bg"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
-
-    <ImageView
-        android:id="@+id/canvas"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="com.xiaoliublog.pic.BackgroundColor"/>
+        <variable
+            name="viewmodel"
+            type="com.xiaoliublog.pic.MainActivityViewModel" />
+    </data>
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:contentDescription="@string/content_image_desc" />
+        tools:context=".MainActivity"
+        background_color="@{viewmodel.bg}">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="80dp"
-        app:srcCompat="@drawable/icon_save" />
+        <com.xiaoliublog.pic.ui.MyImageView
+            android:id="@+id/canvas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/content_image_desc"
+            bitmap="@{viewmodel.result}"/>
 
-    <ProgressBar
-        android:id="@+id/saving"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="80dp"
-        android:indeterminate="true"
-        app:layout_anchor="@id/fab_save"
-        app:layout_anchorGravity="center" />
+        <RelativeLayout
+            android:layout_gravity="bottom|center"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginHorizontal="50dp"
+            android:layout_marginBottom="20dp">
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/efab_transparent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
-        android:layout_marginStart="10dp"
-        android:layout_marginBottom="25dp"
-        android:backgroundTint="@color/white"
-        android:shadowColor="@color/colorAccent"
-        android:text="@string/btn_transparent"
-        app:icon="@drawable/icon_unchecked"
-        app:strokeColor="@color/gray"
-        app:strokeWidth="2dp" />
+            <ImageView
+                android:background="@drawable/dock_bg_dark"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_alignParentBottom="true"/>
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/efab_black"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_marginBottom="25dp"
-        android:backgroundTint="@color/white"
-        android:shadowColor="@color/colorAccent"
-        android:text="@string/bg_black_text"
-        app:icon="@drawable/icon_unchecked"
-        app:strokeColor="@color/gray"
-        app:strokeWidth="2dp" />
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:justifyContent="space_around">
+                <ImageView
+                    android:background="@color/gray"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="-50dp"
+                    />
+            </com.google.android.flexbox.FlexboxLayout>
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="15dp"
+                >
+                <com.google.android.flexbox.FlexboxLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:justifyContent="space_around">
+                    <androidx.appcompat.widget.AppCompatRadioButton
+                        android:id="@+id/radio_transparent"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:button="@null"
+                        android:background="@drawable/radio_btn_transparent"
+                        android:onClick="@{()->viewmodel.setBg(BackgroundColor.Transparent)}"
+                        />
+                    <androidx.appcompat.widget.AppCompatRadioButton
+                        android:id="@+id/radio_white"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:button="@null"
+                        android:background="@drawable/radio_btn_white"
+                        android:onClick="@{()->viewmodel.setBg(BackgroundColor.White)}"
+                        />
+                    <androidx.appcompat.widget.AppCompatRadioButton
+                        android:id="@+id/radio_black"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:button="@null"
+                        android:background="@drawable/radio_btn_black"
+                        android:onClick="@{()->viewmodel.setBg(BackgroundColor.Black)}"
+                        />
+                </com.google.android.flexbox.FlexboxLayout>
+            </RadioGroup>
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/efab_white"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="25dp"
-        android:backgroundTint="@color/white"
-        android:shadowColor="@color/colorAccent"
-        android:text="@string/bg_white_text"
-        app:icon="@drawable/icon_unchecked"
-        app:strokeColor="@color/gray"
-        app:strokeWidth="2dp" />
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="60dp"
+                >
+                <com.google.android.flexbox.FlexboxLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:justifyContent="space_around">
+                    <androidx.appcompat.widget.AppCompatRadioButton
+                        android:id="@+id/btn_import"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:button="@null"
+                        android:background="@drawable/dock_import_light"
+                        android:onClick="selectImg"
+                        />
+                    <androidx.appcompat.widget.AppCompatRadioButton
+                        android:id="@+id/btn_save"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:button="@null"
+                        android:background="@drawable/dock_save_light"
+                        android:onClick="@{()->viewmodel.saveImg()}"
+                        />
+                    <androidx.appcompat.widget.AppCompatRadioButton
+                        android:id="@+id/btn_share"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:button="@null"
+                        android:background="@drawable/dock_share_light"
+                        />
+                </com.google.android.flexbox.FlexboxLayout>
+            </RadioGroup>
+        </RelativeLayout>
 
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>
 
