@@ -25,9 +25,37 @@
         <RelativeLayout
             android:layout_gravity="bottom|center"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="150dp"
             android:layout_marginHorizontal="50dp"
             android:layout_marginBottom="20dp">
+
+            <com.xiaoliublog.pic.ui.MyRadioButtonGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:orientation="horizontal">
+                <com.xiaoliublog.pic.ui.MyRadioButton
+                    android:layout_width="20dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="10dp"
+                    android:button="@drawable/radio_select_red"
+                    />
+                <com.xiaoliublog.pic.ui.MyRadioButton
+                    android:layout_width="20dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="10dp"
+                    />
+                <com.xiaoliublog.pic.ui.MyRadioButton
+                    android:layout_width="20dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="10dp"
+                    />
+                <com.xiaoliublog.pic.ui.MyRadioButton
+                    android:layout_width="20dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="10dp"
+                    />
+            </com.xiaoliublog.pic.ui.MyRadioButtonGroup>
 
             <ImageView
                 android:background="@drawable/dock_bg_dark"
@@ -50,7 +78,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="65dp"
                 >
                 <com.google.android.flexbox.FlexboxLayout
                     android:layout_width="match_parent"
@@ -87,7 +115,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="60dp"
+                android:layout_marginTop="110dp"
                 >
                 <com.google.android.flexbox.FlexboxLayout
                     android:layout_width="match_parent"
