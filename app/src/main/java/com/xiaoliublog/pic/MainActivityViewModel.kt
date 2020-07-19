@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.xiaoliublog.pic.model.Phone
 import com.xiaoliublog.pic.ui.MyImageView
 import com.xiaoliublog.pic.utils.BitmapTransformer
 import com.xiaoliublog.pic.utils.ImageCombiner
@@ -29,6 +30,8 @@ import kotlin.collections.ArrayList
 class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
     private val _t3: Bitmap
     private val transformer = BitmapTransformer(getApplication())
+    public var width: Int = 1774
+    public var height: Int = 3308
 
     private val _result = MutableLiveData<Bitmap>()
     private val  two = MutableLiveData<Bitmap?>()
@@ -39,6 +42,12 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
     val bg: LiveData<Int?> = bgColor
     val result :LiveData<Bitmap> = _result;
+
+    init {
+        options.inDensity = DisplayMetrics.DENSITY_400
+        _t3 = BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.pro2s_noah1_black, options)
+        reRender()
+    }
 
     fun saveImg() {
         Single.create { emitter: SingleEmitter<String?> ->
@@ -72,20 +81,23 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         Log.d(TAG, "reRender: " + bgColor.value)
         val imageComposeBuilder = ImageCombiner();
         imageComposeBuilder.bgColor = (if (bgColor.value == null) BackgroundColor.Transparent else bgColor.value)!!
-        imageComposeBuilder.width = 1826
-        imageComposeBuilder.height = 3252
+        imageComposeBuilder.width = width
+        imageComposeBuilder.height = height
+        Log.d(TAG, "reRender: canvas width=${width},height=${height}")
+
         val images = ArrayList<ImageWithPosition>();
-        images.add(ImageWithPosition(0F, 0F, _t3))
         if (two.value != null) {
-            images.add(ImageWithPosition(555F, 297F, Bitmap.createScaledBitmap(two.value!!, 1080, 2155, true)))
+            Log.d(TAG, "reRender: two width=${two.value!!.width},height=${two.value!!.height}")
+            images.add(ImageWithPosition((width-1635)/2f+116f, (height-2883)/4f+106F, Bitmap.createScaledBitmap(two.value!!, 1287, 2565, true)))
             val color = two.value!!.getPixel(two.value!!.width / 2, 1)
             if (computeContrastBetweenColors(color) < 3f) {
-                images.add(ImageWithPosition(373F, 426F, blackBar))
+                images.add(ImageWithPosition(116F, 106F, blackBar))
             } else {
-                images.add(ImageWithPosition(373F, 426F, whiteBar))
+                images.add(ImageWithPosition(116F, 106F, whiteBar))
             }
         }
-        imageComposeBuilder.images = images;
+        images.add(ImageWithPosition((width-1226)/2f, (height-2162)/4f, Bitmap.createScaledBitmap(_t3, 1226, 2162, true)))
+        imageComposeBuilder.images = images
         _result.postValue(imageComposeBuilder.combine())
     }
 
@@ -164,11 +176,5 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         //        canvas.restore();
         //        return newBitmap;
         //    }
-    }
-
-    init {
-        options.inDensity = DisplayMetrics.DENSITY_400
-        _t3 = BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.t3_transparent, options)
-        _result.postValue(_t3)
     }
 }

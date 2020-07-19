@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
@@ -53,6 +54,7 @@ public class MyImageView extends androidx.appcompat.widget.AppCompatImageView {
 
 
     @Override
+
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
@@ -72,15 +74,7 @@ public class MyImageView extends androidx.appcompat.widget.AppCompatImageView {
 
         if (bitmap != null){
             canvas.save();
-            for (int i=0;i<pointLength-1;i+=2){
-                verts[i] = paddingLeft + (contentWidth/meshWidth)*i;
-                verts[i+1] = paddingTop + (contentHeight/meshHeight)*i;
-            }
-            for (int i=0;i<pointLength-1;i+=2){
-                verts[i+pointLength] = verts[i] + 10;
-                verts[i+1+pointLength] = verts[i+1];
-            }
-            canvas.drawBitmapMesh(bitmap, meshWidth,meshHeight, verts,0,null,0, null);
+            canvas.drawBitmap(bitmap,null,paint);
             canvas.restore();
         }
 

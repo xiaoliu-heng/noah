@@ -1,46 +1,83 @@
 package com.xiaoliublog.pic.ui;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Paint;
+import android.graphics.Shader;
 import android.util.AttributeSet;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatRadioButton;
 
+import com.xiaoliublog.pic.R;
+
 public class MyRadioButton extends AppCompatRadioButton {
+    private Paint mPaint = new Paint();
+    private Paint borderPaint = new Paint();
+    private int selectedColor = Color.WHITE;
+    private int shapeFlag = 0;
+    private float mPadding = 1;
+    private ValueAnimator animator;
+
     public MyRadioButton(Context context) {
         super(context);
+        init();
     }
 
     public MyRadioButton(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MyRadioButton);
+        selectedColor = typedArray.getColor(R.styleable.MyRadioButton_selectedColor, Color.WHITE);
+        shapeFlag = typedArray.getColor(R.styleable.MyRadioButton_shape, 0);
+        typedArray.recycle();
+        init();
     }
 
     public MyRadioButton(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MyRadioButton);
+        selectedColor = typedArray.getColor(R.styleable.MyRadioButton_selectedColor, Color.WHITE);
+        shapeFlag = typedArray.getColor(R.styleable.MyRadioButton_shape, 0);
+        typedArray.recycle();
+        init();
     }
 
-    private void drawUnSelected(Canvas canvas){
-        canvas.save();
-        this.getPaint().setColor(Color.WHITE);
-        canvas.drawRoundRect(5, 10, getWidth()-5, getHeight()-10, 10, 10, getPaint());
-        canvas.restore();
+    private void init(){
+        Shader shader = new LinearGradient(0,0,getWidth(),getHeight(),selectedColor,Color.WHITE,Shader.TileMode.CLAMP);
+        mPaint.setShader(shader);
+        mPaint.setColor(selectedColor);
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setColor(Color.WHITE);
+        borderPaint.setStrokeWidth(4);
+        borderPaint.setAntiAlias(true);
     }
 
-    private void drawSelected(Canvas canvas){
-        canvas.save();
-        this.getPaint().setColor(Color.BLACK);
-        canvas.drawRoundRect(0, 0, getWidth(), getHeight(), 10, 10, getPaint());
-        canvas.restore();
+    @Override
+    public void setChecked(boolean checked) {
+        animator = ValueAnimator
+                .ofFloat(checked ? 5 : 1, checked ? 1: 5)
+                .setDuration(200);
+        animator.addUpdateListener(animation -> {
+            mPadding = (float) animation.getAnimatedValue();
+            postInvalidate();
+        });
+        animator.start();
+        super.setChecked(checked);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (isChecked()){
-            drawSelected(canvas);
+        mPaint.setStrokeWidth(2f);
+        if (shapeFlag==0){
+            canvas.drawRoundRect(mPadding, mPadding*2, getWidth() - mPadding, getHeight() - mPadding*2, 15-mPadding, 15-mPadding, mPaint);
+            canvas.drawRoundRect(mPadding, mPadding*2, getWidth() - mPadding, getHeight() - mPadding*2, 15-mPadding, 15-mPadding, borderPaint);
         }else {
-            drawUnSelected(canvas);
+            canvas.drawCircle(getWidth()/2f,getHeight()/2f,(getWidth()-mPadding)/2f-2, mPaint);
+            canvas.drawCircle(getWidth()/2f,getHeight()/2f,(getWidth()-mPadding)/2f-2, borderPaint);
         }
     }
 

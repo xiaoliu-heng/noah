@@ -1,5 +1,6 @@
 package com.xiaoliublog.pic
 
+import android.R.attr.bitmap
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -10,10 +11,8 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
-import android.widget.ImageView
-import android.widget.RadioButton
 import androidx.appcompat.app.AppCompatActivity
-import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.FileProvider
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
@@ -21,9 +20,13 @@ import com.xiaoliublog.pic.MainActivityViewModel
 import com.xiaoliublog.pic.databinding.ActivityMainBinding
 import com.xiaoliublog.pic.ui.MyImageView
 import io.reactivex.disposables.CompositeDisposable
+import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 
+
 class MainActivity : AppCompatActivity() {
+
     var options: BitmapFactory.Options? = null
     private val disposable = CompositeDisposable()
     private var _binding: ActivityMainBinding? = null
@@ -38,12 +41,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        var displayMetrics: DisplayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+
         _model = ViewModelProvider(this).get(MainActivityViewModel::class.java)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
         binding.viewmodel = model
         binding.lifecycleOwner = this
+        val scale = displayMetrics.density
+        model.width = (displayMetrics.widthPixels * scale + 0.5f).toInt()
+        model.height = (displayMetrics.heightPixels * scale + 0.5f).toInt()
 
         val intent = intent
         val action = intent.action
@@ -66,6 +76,30 @@ class MainActivity : AppCompatActivity() {
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT
         startActivityForResult(Intent.createChooser(intent, "选择截图"), IMAGE_PICKER)
+    }
+
+    fun shareImg(view: View?) {
+        try {
+            val cachePath = File(getCacheDir(), "images")
+            cachePath.mkdirs() // don't forget to make the directory
+            val stream = FileOutputStream(cachePath.toString() + "/image.png") // overwrites this image every time
+            model.result.value!!.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            val imagePath = File(getCacheDir(), "images")
+            val newFile = File(imagePath, "image.png")
+            val contentUri = FileProvider.getUriForFile(this, "com.xiaoliublog.pic.fileprovider", newFile)
+
+            if (contentUri != null) {
+                val shareIntent = Intent()
+                shareIntent.action = Intent.ACTION_SEND
+                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) // temp permission for receiving app to read this file
+                shareIntent.setDataAndType(contentUri, contentResolver.getType(contentUri))
+                shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
+                startActivity(Intent.createChooser(shareIntent, "选择要分享的APP"))
+            }
+            stream.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
     }
 
     @Throws(IOException::class)

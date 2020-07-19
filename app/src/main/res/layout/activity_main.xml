@@ -23,39 +23,12 @@
             bitmap="@{viewmodel.result}"/>
 
         <RelativeLayout
+            android:id="@+id/dock"
             android:layout_gravity="bottom|center"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height="120dp"
             android:layout_marginHorizontal="50dp"
             android:layout_marginBottom="20dp">
-
-            <com.xiaoliublog.pic.ui.MyRadioButtonGroup
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
-                android:orientation="horizontal">
-                <com.xiaoliublog.pic.ui.MyRadioButton
-                    android:layout_width="20dp"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="10dp"
-                    android:button="@drawable/radio_select_red"
-                    />
-                <com.xiaoliublog.pic.ui.MyRadioButton
-                    android:layout_width="20dp"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="10dp"
-                    />
-                <com.xiaoliublog.pic.ui.MyRadioButton
-                    android:layout_width="20dp"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="10dp"
-                    />
-                <com.xiaoliublog.pic.ui.MyRadioButton
-                    android:layout_width="20dp"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="10dp"
-                    />
-            </com.xiaoliublog.pic.ui.MyRadioButtonGroup>
 
             <ImageView
                 android:background="@drawable/dock_bg_dark"
@@ -63,49 +36,41 @@
                 android:layout_height="70dp"
                 android:layout_alignParentBottom="true"/>
 
-            <com.google.android.flexbox.FlexboxLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:justifyContent="space_around">
-                <ImageView
-                    android:background="@color/gray"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="-50dp"
-                    />
-            </com.google.android.flexbox.FlexboxLayout>
             <RadioGroup
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="65dp"
+                android:layout_marginTop="35dp"
                 >
                 <com.google.android.flexbox.FlexboxLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:justifyContent="space_around">
-                    <androidx.appcompat.widget.AppCompatRadioButton
+                    <com.xiaoliublog.pic.ui.MyRadioButton
                         android:id="@+id/radio_transparent"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:button="@null"
-                        android:background="@drawable/radio_btn_transparent"
+                        app:selectedColor="@color/transparent"
+                        app:shape="circle"
                         android:onClick="@{()->viewmodel.setBg(BackgroundColor.Transparent)}"
                         />
-                    <androidx.appcompat.widget.AppCompatRadioButton
+                    <com.xiaoliublog.pic.ui.MyRadioButton
                         android:id="@+id/radio_white"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:button="@null"
-                        android:background="@drawable/radio_btn_white"
+                        app:selectedColor="#F6F6F5"
+                        app:shape="circle"
                         android:onClick="@{()->viewmodel.setBg(BackgroundColor.White)}"
                         />
-                    <androidx.appcompat.widget.AppCompatRadioButton
+                    <com.xiaoliublog.pic.ui.MyRadioButton
                         android:id="@+id/radio_black"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:button="@null"
-                        android:background="@drawable/radio_btn_black"
+                        app:selectedColor="#515152"
+                        app:shape="circle"
                         android:onClick="@{()->viewmodel.setBg(BackgroundColor.Black)}"
                         />
                 </com.google.android.flexbox.FlexboxLayout>
@@ -115,7 +80,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="110dp"
+                android:layout_marginTop="80dp"
                 >
                 <com.google.android.flexbox.FlexboxLayout
                     android:layout_width="match_parent"
@@ -143,11 +108,44 @@
                         android:layout_height="30dp"
                         android:button="@null"
                         android:background="@drawable/dock_share_light"
+                        android:onClick="shareImg"
                         />
                 </com.google.android.flexbox.FlexboxLayout>
             </RadioGroup>
         </RelativeLayout>
 
+        <com.xiaoliublog.pic.ui.MyRadioButtonGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_anchorGravity="center_horizontal"
+            app:layout_anchor="@id/dock"
+            app:layout_dodgeInsetEdges="top"
+            android:orientation="horizontal">
+            <com.xiaoliublog.pic.ui.MyRadioButton
+                android:layout_width="20dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                app:selectedColor="#FEFFFE"
+                />
+            <com.xiaoliublog.pic.ui.MyRadioButton
+                android:layout_width="20dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                app:selectedColor="#191A19"
+                />
+            <com.xiaoliublog.pic.ui.MyRadioButton
+                android:layout_width="20dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                app:selectedColor="#FEA6A3"
+                />
+            <com.xiaoliublog.pic.ui.MyRadioButton
+                android:layout_width="20dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                app:selectedColor="#2D4B0F"
+                />
+        </com.xiaoliublog.pic.ui.MyRadioButtonGroup>
 
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
