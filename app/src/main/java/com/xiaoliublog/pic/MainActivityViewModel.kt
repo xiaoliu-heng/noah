@@ -30,12 +30,20 @@ import kotlin.collections.ArrayList
 class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
     private val _t3: Bitmap
     private val transformer = BitmapTransformer(getApplication())
-    public var width: Int = 1774
-    public var height: Int = 3308
+    var _width = MutableLiveData<Int>(2700)
+    val width
+        get() = _width.value!!
+
+    var _height = MutableLiveData<Int>(5175)
+    val height
+        get() = _height.value!!
+
+    var frameWidth = 1635
+    var frameHeight = 2883
 
     private val _result = MutableLiveData<Bitmap>()
     private val  two = MutableLiveData<Bitmap?>()
-    private val  bgColor = MutableLiveData(BackgroundColor.Transparent)
+    private val  bgColor = MutableLiveData(BackgroundColor.Black)
     private val options = BitmapFactory.Options()
     private val blackBar = BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bar_black, options)
     private val whiteBar = BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bar_white, options)
@@ -46,6 +54,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     init {
         options.inDensity = DisplayMetrics.DENSITY_400
         _t3 = BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.pro2s_noah1_black, options)
+        frameHeight = _t3.height
+        frameWidth = _t3.width
         reRender()
     }
 
@@ -88,15 +98,16 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         val images = ArrayList<ImageWithPosition>();
         if (two.value != null) {
             Log.d(TAG, "reRender: two width=${two.value!!.width},height=${two.value!!.height}")
-            images.add(ImageWithPosition((width-1635)/2f+116f, (height-2883)/4f+106F, Bitmap.createScaledBitmap(two.value!!, 1287, 2565, true)))
+            images.add(ImageWithPosition((width-frameWidth)/2f+115f, (height-frameHeight)/4f+106f,
+                    Bitmap.createScaledBitmap(two.value!!, frameWidth-114*2, frameHeight-106*2, true)))
             val color = two.value!!.getPixel(two.value!!.width / 2, 1)
             if (computeContrastBetweenColors(color) < 3f) {
-                images.add(ImageWithPosition(116F, 106F, blackBar))
+                images.add(ImageWithPosition((width-frameWidth)/2f+115f, (height-frameHeight)/4f+106f, Bitmap.createScaledBitmap(blackBar, frameWidth-115*2, 56, true)))
             } else {
-                images.add(ImageWithPosition(116F, 106F, whiteBar))
+                images.add(ImageWithPosition((width-frameWidth)/2f+115f, (height-frameHeight)/4f+106f, Bitmap.createScaledBitmap(whiteBar, frameWidth-115*2, 56, true)))
             }
         }
-        images.add(ImageWithPosition((width-1226)/2f, (height-2162)/4f, Bitmap.createScaledBitmap(_t3, 1226, 2162, true)))
+        images.add(ImageWithPosition((width-frameWidth)/2f, (height-frameHeight)/4f, _t3))
         imageComposeBuilder.images = images
         _result.postValue(imageComposeBuilder.combine())
     }

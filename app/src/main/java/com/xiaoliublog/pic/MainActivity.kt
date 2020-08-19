@@ -1,6 +1,5 @@
 package com.xiaoliublog.pic
 
-import android.R.attr.bitmap
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -15,8 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.xiaoliublog.pic.MainActivityViewModel
 import com.xiaoliublog.pic.databinding.ActivityMainBinding
 import com.xiaoliublog.pic.ui.MyImageView
 import io.reactivex.disposables.CompositeDisposable
@@ -52,8 +51,11 @@ class MainActivity : AppCompatActivity() {
         binding.viewmodel = model
         binding.lifecycleOwner = this
         val scale = displayMetrics.density
-        model.width = (displayMetrics.widthPixels * scale + 0.5f).toInt()
-        model.height = (displayMetrics.heightPixels * scale + 0.5f).toInt()
+        model._width.value = (displayMetrics.widthPixels * scale + 0.5f).toInt()
+        model._height.value = (displayMetrics.heightPixels * scale + 0.5f).toInt()
+
+        model._width.observe(this, Observer { t -> model.reRender() })
+        model.bg.observe(this, Observer { t -> model.reRender() })
 
         val intent = intent
         val action = intent.action
