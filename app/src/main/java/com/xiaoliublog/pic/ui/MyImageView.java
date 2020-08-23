@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -21,11 +22,7 @@ public class MyImageView extends androidx.appcompat.widget.AppCompatImageView {
 
     private TextPaint mTextPaint;
     private Paint paint;
-
-    int meshWidth = 3;
-    int meshHeight = 3;
-    int pointLength = (meshWidth+1)*(meshHeight+1);
-    float[] verts = new float[pointLength*2];
+    private Matrix matrix;
 
     public MyImageView(Context context) {
         super(context);
@@ -49,6 +46,7 @@ public class MyImageView extends androidx.appcompat.widget.AppCompatImageView {
         mTextPaint.setTextAlign(Paint.Align.LEFT);
 
         paint = new Paint();
+        matrix = new Matrix();
 
     }
 
@@ -72,9 +70,11 @@ public class MyImageView extends androidx.appcompat.widget.AppCompatImageView {
         int centerX = paddingLeft + contentWidth/2;
         int centerY = paddingTop + contentHeight/2;
 
+        matrix.setScale(contentWidth, contentHeight);
+
         if (bitmap != null){
             canvas.save();
-            canvas.drawBitmap(bitmap,null,paint);
+            canvas.drawBitmap(bitmap, null, paint);
             canvas.restore();
         }
 

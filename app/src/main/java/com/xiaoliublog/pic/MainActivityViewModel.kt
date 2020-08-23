@@ -13,9 +13,9 @@ import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.xiaoliublog.pic.model.NoahPro2s
 import com.xiaoliublog.pic.model.Phone
-import com.xiaoliublog.pic.ui.MyImageView
-import com.xiaoliublog.pic.utils.BitmapTransformer
+import com.xiaoliublog.pic.model.PhoneColor
 import com.xiaoliublog.pic.utils.ImageCombiner
 import com.xiaoliublog.pic.utils.ImageWithPosition
 import io.reactivex.Single
@@ -29,33 +29,30 @@ import kotlin.collections.ArrayList
 
 class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
     private val _t3: Bitmap
-    private val transformer = BitmapTransformer(getApplication())
+    private val phone: Phone
     var _width = MutableLiveData<Int>(2700)
-    val width
-        get() = _width.value!!
 
     var _height = MutableLiveData<Int>(5175)
-    val height
-        get() = _height.value!!
 
     var frameWidth = 1635
     var frameHeight = 2883
 
     private val _result = MutableLiveData<Bitmap>()
-    private val  two = MutableLiveData<Bitmap?>()
-    private val  bgColor = MutableLiveData(BackgroundColor.Black)
+    private val two = MutableLiveData<Bitmap?>()
+    private val _bgColor = MutableLiveData(BackgroundColor.Black)
+    private val fgColor = MutableLiveData<PhoneColor>(PhoneColor.Black)
     private val options = BitmapFactory.Options()
     private val blackBar = BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bar_black, options)
     private val whiteBar = BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bar_white, options)
 
-    val bg: LiveData<Int?> = bgColor
-    val result :LiveData<Bitmap> = _result;
+    val bg = _bgColor
+    val result: LiveData<Bitmap> = _result
+    val isDark: Boolean = _bgColor.value?.equals(BackgroundColor.Black) ?: true
 
     init {
         options.inDensity = DisplayMetrics.DENSITY_400
         _t3 = BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.pro2s_noah1_black, options)
-        frameHeight = _t3.height
-        frameWidth = _t3.width
+        phone = NoahPro2s(getApplication())
         reRender()
     }
 
@@ -66,13 +63,9 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
             val filename = "$path/Pictures/Screenshots/$name"
             try {
                 FileOutputStream(filename).use { out ->
-                    if (result.value != null) {
-                        result.value!!.compress(Bitmap.CompressFormat.PNG, 100, out)
-                        getApplication<Application>().sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://$filename")))
-                        emitter.onSuccess("保存成功")
-                    } else {
-                        emitter.onError(Exception("保存失败"))
-                    }
+                    build(true).compress(Bitmap.CompressFormat.PNG, 100, out)
+                    getApplication<Application>().sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://$filename")))
+                    emitter.onSuccess("保存成功")
                 }
             } catch (e: IOException) {
                 emitter.onError(e)
@@ -83,38 +76,60 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
                 .subscribe()
     }
 
-    fun setBg(bg: Int) {
-        bgColor.postValue(bg)
+    fun build(export: Boolean? = false): Bitmap {
+        val padding_h = 400
+        val padding_v = 600
+        val padding_top = if (export == true) padding_v / 2f else padding_v / 4f
+        val imageComposeBuilder = ImageCombiner()
+        val current = phone.colors.getOrDefault(fgColor.value!!, _t3)
+        frameHeight = current.height / 4
+        frameWidth = current.width / 4
+        imageComposeBuilder.bgColor = (if (_bgColor.value == null) BackgroundColor.Transparent else _bgColor.value)!!
+        imageComposeBuilder.width = frameWidth + padding_h
+        imageComposeBuilder.height = frameHeight + padding_v
+        Log.d(TAG, "reRender: canvas width=${imageComposeBuilder.width},height=${imageComposeBuilder.height}. image width=${frameWidth},height=${frameHeight}")
+
+        val images = ArrayList<ImageWithPosition>()
+        if (two.value != null) {
+            Log.d(TAG, "reRender: two width=${two.value!!.width},height=${two.value!!.height}")
+            val two_left = phone.left + padding_h / 2f - 45
+            val two_top = phone.top + padding_top - 40
+            val two_width = frameWidth - phone.left.toInt() / 2 * 2 - 15
+            val two_height = frameHeight - phone.top.toInt() / 2 * 2 - 5
+            images.add(ImageWithPosition(two_left, two_top,
+                    Bitmap.createScaledBitmap(two.value!!, two_width, two_height, true)))
+            val color = two.value!!.getPixel(two.value!!.width / 2, 1)
+            val bar_bg = Bitmap.createBitmap(two_width, 125, Bitmap.Config.ARGB_8888);
+            if (computeContrastBetweenColors(color) < 3f) {
+                bar_bg.eraseColor(BackgroundColor.White)
+                images.add(ImageWithPosition(two_left, two_top, bar_bg))
+                images.add(ImageWithPosition(two_left, two_top, Bitmap.createScaledBitmap(blackBar, two_width, two_height, true)))
+            } else {
+                bar_bg.eraseColor(BackgroundColor.Black)
+                images.add(ImageWithPosition(two_left, two_top, bar_bg))
+                images.add(ImageWithPosition(two_left, two_top, Bitmap.createScaledBitmap(whiteBar, two_width, two_height, true)))
+            }
+        }
+        images.add(ImageWithPosition(padding_h / 2f, padding_top, Bitmap.createScaledBitmap(current, frameWidth, frameHeight, true)))
+        imageComposeBuilder.images = images
+        val res = imageComposeBuilder.combine()
+        Log.d(TAG, "reRender: result: width:${res.width},height:${res.height}")
+        return res
     }
 
     fun reRender() {
-        Log.d(TAG, "reRender: " + bgColor.value)
-        val imageComposeBuilder = ImageCombiner();
-        imageComposeBuilder.bgColor = (if (bgColor.value == null) BackgroundColor.Transparent else bgColor.value)!!
-        imageComposeBuilder.width = width
-        imageComposeBuilder.height = height
-        Log.d(TAG, "reRender: canvas width=${width},height=${height}")
-
-        val images = ArrayList<ImageWithPosition>();
-        if (two.value != null) {
-            Log.d(TAG, "reRender: two width=${two.value!!.width},height=${two.value!!.height}")
-            images.add(ImageWithPosition((width-frameWidth)/2f+115f, (height-frameHeight)/4f+106f,
-                    Bitmap.createScaledBitmap(two.value!!, frameWidth-114*2, frameHeight-106*2, true)))
-            val color = two.value!!.getPixel(two.value!!.width / 2, 1)
-            if (computeContrastBetweenColors(color) < 3f) {
-                images.add(ImageWithPosition((width-frameWidth)/2f+115f, (height-frameHeight)/4f+106f, Bitmap.createScaledBitmap(blackBar, frameWidth-115*2, 56, true)))
-            } else {
-                images.add(ImageWithPosition((width-frameWidth)/2f+115f, (height-frameHeight)/4f+106f, Bitmap.createScaledBitmap(whiteBar, frameWidth-115*2, 56, true)))
-            }
-        }
-        images.add(ImageWithPosition((width-frameWidth)/2f, (height-frameHeight)/4f, _t3))
-        imageComposeBuilder.images = images
-        _result.postValue(imageComposeBuilder.combine())
+        _result.postValue(build(false))
     }
 
     fun setBgColor(color: Int) {
         Log.d(TAG, "setBgColor: $color")
-        bgColor.value = color
+        _bgColor.value = color
+        reRender()
+    }
+
+    fun setFgColor(color: PhoneColor) {
+        Log.d(TAG, "setFgColor: $color")
+        fgColor.value = color
         reRender()
     }
 
@@ -141,51 +156,6 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
             fgB = if (fgB < 0.03928f) fgB / 12.92f else Math.pow((fgB + 0.055f) / 1.055f.toDouble(), 2.4).toFloat()
             val fgL = 0.2126f * fgR + 0.7152f * fgG + 0.0722f * fgB
             return Math.abs((fgL + 0.05f) / (bgL + 0.05f))
-        } //    public Bitmap compoundBitmap_t3(Bitmap one, Bitmap two) {
-        //        one = one.copy(Bitmap.Config.ARGB_8888, true);
-        //        two = two.copy(Bitmap.Config.ARGB_8888, true);
-        //        if (two.getWidth() > two.getHeight()) {
-        //            Matrix matrix = new Matrix();
-        //            matrix.postRotate(-90);
-        //            two = Bitmap.createBitmap(two, 0, 0, two.getWidth(), two.getHeight(),
-        //                    matrix, true);
-        //        }
-        //        two = Bitmap.createBitmap(two, 0, 82, two.getWidth(), two.getHeight() - 82);
-        //        two = Bitmap.createScaledBitmap(two, 1080, 2155, true);
-        //        int color = two.getPixel(two.getWidth() / 2, 1);
-        //        Bitmap bar;
-        //        if (computeContrastBetweenColors(color) < 3f) {
-        //            Log.d(TAG, "compoundBitmap_t3: 白");
-        //            bar = BitmapFactory.decodeResource(getApplication().getResources(), R.drawable.bar_black, options);
-        //        } else {
-        //            Log.d(TAG, "compoundBitmap_t3: 黑");
-        //            bar = BitmapFactory.decodeResource(getApplication().getResources(), R.drawable.bar_white, options);
-        //        }
-        //        bar = bar.copy(Bitmap.Config.ARGB_8888, true);
-        //        Log.d(TAG, "t3:" + one.getWidth() + "x" + one.getHeight());
-        //        Log.d(TAG, "two:" + two.getWidth() + "x" + two.getHeight());
-        //        Bitmap newBitmap = Bitmap.createBitmap(1826, 3252, Bitmap.Config.ARGB_8888, true);
-        //        Canvas canvas = new Canvas(newBitmap);
-        //        Paint paint = new Paint();
-        //
-        ////        Bitmap status_bg_origin = Bitmap.createBitmap(two, 0, 0, two.getWidth(), 2);
-        ////        Bitmap status_bg = Bitmap.createScaledBitmap(status_bg_origin, 1080, 124, true);
-        //        Bitmap status_bg = Bitmap.createBitmap(1080, 124, Bitmap.Config.ARGB_8888);
-        //        status_bg.eraseColor(color);
-        ////        Bitmap botton_bg_origin = Bitmap.createBitmap(two,0,two.getHeight()-2,two.getWidth(),2);
-        ////        Bitmap bottom_bg = Bitmap.createScaledBitmap(botton_bg_origin,1080,121,true);
-        //        Bitmap bottom_bg = Bitmap.createBitmap(1080, 131, Bitmap.Config.ARGB_8888);
-        //        bottom_bg.eraseColor(two.getPixel(two.getWidth() / 2, two.getHeight() - 1));
-        //
-        //        canvas.drawColor(bgColor.getValue());
-        //        canvas.drawBitmap(transformer.blur(status_bg), 372, 426, paint);
-        //        canvas.drawBitmap(bottom_bg, 372, 2698, paint);
-        //        canvas.drawBitmap(two, 372, 550, paint);
-        //        canvas.drawBitmap(bar, 373, 426, paint);
-        //        canvas.drawBitmap(one, 0, 0, paint);
-        //        canvas.save();
-        //        canvas.restore();
-        //        return newBitmap;
-        //    }
+        }
     }
 }

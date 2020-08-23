@@ -11,8 +11,8 @@ enum class PhoneColor {
 
 open class Phone {
     lateinit var colors: MutableMap<PhoneColor, Bitmap>
-    val top: Int = 0
-    val right: Int = 0
-    val bottom: Int = 0
-    val left: Int = 0
+    var top: Float = 0f
+    var left: Float = 0f
+    var right: Float = 0f
+    var bottom: Float = 0f
 }

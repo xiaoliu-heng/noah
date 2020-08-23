@@ -23,7 +23,7 @@
 
         <activity
             android:name=".SplashActivity"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,7 +33,8 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="fullSensor">
+            android:screenOrientation="portrait"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 

@@ -10,6 +10,7 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.databinding.BindingAdapter
@@ -36,6 +37,8 @@ class MainActivity : AppCompatActivity() {
     private val model
         get() = _model!!
 
+    private var canvas:ImageView? = null;
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -46,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         _model = ViewModelProvider(this).get(MainActivityViewModel::class.java)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        canvas = findViewById(R.id.canvas)
 
         binding.viewmodel = model
         binding.lifecycleOwner = this
@@ -56,6 +59,7 @@ class MainActivity : AppCompatActivity() {
 
         model._width.observe(this, Observer { t -> model.reRender() })
         model.bg.observe(this, Observer { t -> model.reRender() })
+        model.result.observe(this, Observer { res -> canvas?.setImageBitmap(res) })
 
         val intent = intent
         val action = intent.action
