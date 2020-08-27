@@ -40,7 +40,8 @@
                     android:background="@color/transparent"
                     android:src="@{viewmodel.isDark?@drawable/noah1_icon_dark:@drawable/noah1_icon_light}"
                     android:paddingStart="10dp"
-                    tools:ignore="RtlSymmetry" />
+                    tools:ignore="RtlSymmetry"
+                    android:onClick="@{(v)->viewmodel.switchNoah1(v)}"/>
 
                 <ImageButton
                     android:layout_width="3dp"
@@ -59,7 +60,8 @@
                     android:src="@{viewmodel.isDark?@drawable/noah2_icon_dark:@drawable/noah2_icon_light}"
                     android:paddingEnd="10dp"
                     tools:ignore="RtlSymmetry"
-                    />
+                    android:onClick="@{(v)->viewmodel.switchNoah2(v)}"
+                />
 
             </com.google.android.flexbox.FlexboxLayout>
 

@@ -146,7 +146,29 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         reRender()
     }
 
-    fun showAbout(view: View){
+    private fun animation(view: View) {
+        view.animate().apply {
+            duration = 100
+            scaleX(0.8f)
+            scaleY(0.8f)
+            withEndAction {
+                scaleX(1f)
+                scaleY(1f)
+                start()
+            }
+            start()
+        }
+    }
+
+    fun switchNoah1(view: View) {
+        animation(view)
+    }
+
+    fun switchNoah2(view: View) {
+        animation(view)
+    }
+
+    fun showAbout(view: View) {
         view.animate()
                 .rotation(if (view.rotation == 90f) 0f else 90f)
                 .start()
