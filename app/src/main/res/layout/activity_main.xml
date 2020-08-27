@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -13,12 +14,73 @@
             type="com.xiaoliublog.pic.MainActivityViewModel" />
     </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:tools="http://schemas.android.com/tools"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/bg"
         background_color="@{viewmodel.bg}"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MainActivity">
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:justifyContent="space_between"
+            background_color="@{viewmodel.bg}"
+            android:paddingVertical="10dp"
+            android:background="@{viewmodel.isDark?@drawable/border_dark:@drawable/border_light}"
+            >
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageButton
+                    android:layout_width="32dp"
+                    android:layout_height="34dp"
+                    android:scaleType="fitXY"
+                    android:background="@color/transparent"
+                    android:src="@{viewmodel.isDark?@drawable/noah1_icon_dark:@drawable/noah1_icon_light}"
+                    android:paddingStart="10dp"
+                    tools:ignore="RtlSymmetry" />
+
+                <ImageButton
+                    android:layout_width="3dp"
+                    android:layout_height="34dp"
+                    android:scaleType="fitCenter"
+                    android:background="@color/transparent"
+                    android:src="@{viewmodel.isDark?@drawable/icon_split_dark:@drawable/icon_split_light}"
+                    android:layout_marginHorizontal="10dp"
+                    />
+
+                <ImageButton
+                    android:layout_width="32dp"
+                    android:layout_height="34dp"
+                    android:scaleType="fitXY"
+                    android:background="@color/transparent"
+                    android:src="@{viewmodel.isDark?@drawable/noah2_icon_dark:@drawable/noah2_icon_light}"
+                    android:paddingEnd="10dp"
+                    tools:ignore="RtlSymmetry"
+                    />
+
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="10dp">
+
+                <ImageButton
+                    android:layout_width="32dp"
+                    android:layout_height="34dp"
+                    android:scaleType="fitXY"
+                    android:background="@color/transparent"
+                    android:src="@{viewmodel.isDark?@drawable/icon_menu_dark:@drawable/icon_menu_light}"
+                    android:paddingStart="10dp"
+                    tools:ignore="RtlSymmetry" />
+
+            </com.google.android.flexbox.FlexboxLayout>
+
+
+        </com.google.android.flexbox.FlexboxLayout>
 
         <ImageView
             android:id="@+id/canvas"
@@ -30,18 +92,25 @@
         <RelativeLayout
             android:id="@+id/dock"
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="130dp"
             android:layout_gravity="bottom|center"
             android:layout_marginHorizontal="50dp"
-            android:layout_marginBottom="20dp">
+            android:layout_marginBottom="30dp">
+
+            <ImageView
+                android:layout_width="200dp"
+                android:layout_centerHorizontal="true"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="75dp"
+                android:background="@{viewmodel.isDark?@drawable/dock_split_dark:@drawable/dock_split_light}" />
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
+                android:layout_height="80dp"
                 android:layout_alignParentBottom="true"
-                android:background="@{viewmodel.isDark?@drawable/dock_bg_dark:@drawable/dock_bg_light}"
-                />
+                android:background="@{viewmodel.isDark?@drawable/dock_bg_dark:@drawable/dock_bg_light}" />
 
+            <!--        背景颜色选择    -->
             <RadioGroup
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -54,12 +123,12 @@
                     app:justifyContent="space_around">
 
                     <com.xiaoliublog.pic.ui.MyRadioButton
-                        android:id="@+id/radio_transparent"
+                        android:id="@+id/radio_black"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:button="@null"
-                        android:onClick="@{()->viewmodel.setBgColor(BackgroundColor.Transparent)}"
-                        app:selectedColor="@color/transparent"
+                        android:onClick="@{()->viewmodel.setBgColor(BackgroundColor.Black)}"
+                        app:selectedColor="#515152"
                         app:shape="circle" />
 
                     <com.xiaoliublog.pic.ui.MyRadioButton
@@ -68,24 +137,25 @@
                         android:layout_height="30dp"
                         android:button="@null"
                         android:onClick="@{()->viewmodel.setBgColor(BackgroundColor.White)}"
-                        app:selectedColor="#F6F6F5"
+                        app:selectedColor="#E6E6E6"
                         app:shape="circle" />
 
                     <com.xiaoliublog.pic.ui.MyRadioButton
-                        android:id="@+id/radio_black"
+                        android:id="@+id/radio_transparent"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:button="@null"
-                        android:onClick="@{()->viewmodel.setBgColor(BackgroundColor.Black)}"
-                        app:selectedColor="#515152"
+                        android:onClick="@{()->viewmodel.setBgColor(BackgroundColor.Transparent)}"
+                        app:selectedColor="@color/transparent"
                         app:shape="circle" />
                 </com.google.android.flexbox.FlexboxLayout>
             </RadioGroup>
 
+            <!--        动作按钮    -->
             <RadioGroup
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="80dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="85dp"
                 android:orientation="horizontal">
 
                 <com.google.android.flexbox.FlexboxLayout
@@ -118,8 +188,10 @@
                         android:onClick="shareImg" />
                 </com.google.android.flexbox.FlexboxLayout>
             </RadioGroup>
+
         </RelativeLayout>
 
+        <!--    手机壳颜色选择    -->
         <com.xiaoliublog.pic.ui.MyRadioButtonGroup
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

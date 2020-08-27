@@ -19,6 +19,8 @@ class NoahPro2s(var context: Context?) : Phone() {
         )
         left = 115f
         top = 106f
+        width = 1108f
+        height = 2067f
     }
 
 }

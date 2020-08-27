@@ -16,6 +16,7 @@ import androidx.lifecycle.MutableLiveData
 import com.xiaoliublog.pic.model.NoahPro2s
 import com.xiaoliublog.pic.model.Phone
 import com.xiaoliublog.pic.model.PhoneColor
+import com.xiaoliublog.pic.utils.BitmapTransformer
 import com.xiaoliublog.pic.utils.ImageCombiner
 import com.xiaoliublog.pic.utils.ImageWithPosition
 import io.reactivex.Single
@@ -77,13 +78,14 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun build(export: Boolean? = false): Bitmap {
-        val padding_h = 400
-        val padding_v = 600
+        val padding_h = 600
+        val padding_v = 800
         val padding_top = if (export == true) padding_v / 2f else padding_v / 4f
+        val barHeight = 100
         val imageComposeBuilder = ImageCombiner()
         val current = phone.colors.getOrDefault(fgColor.value!!, _t3)
-        frameHeight = current.height / 4
-        frameWidth = current.width / 4
+        frameHeight = phone.height.toInt()
+        frameWidth = phone.width.toInt()
         imageComposeBuilder.bgColor = (if (_bgColor.value == null) BackgroundColor.Transparent else _bgColor.value)!!
         imageComposeBuilder.width = frameWidth + padding_h
         imageComposeBuilder.height = frameHeight + padding_v
@@ -92,22 +94,26 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         val images = ArrayList<ImageWithPosition>()
         if (two.value != null) {
             Log.d(TAG, "reRender: two width=${two.value!!.width},height=${two.value!!.height}")
-            val two_left = phone.left + padding_h / 2f - 45
-            val two_top = phone.top + padding_top - 40
-            val two_width = frameWidth - phone.left.toInt() / 2 * 2 - 15
-            val two_height = frameHeight - phone.top.toInt() / 2 * 2 - 5
-            images.add(ImageWithPosition(two_left, two_top,
-                    Bitmap.createScaledBitmap(two.value!!, two_width, two_height, true)))
+            val twoLeft = padding_h / 2f + 65
+            val twoTop = padding_top + 60
+            val twoWidth = frameWidth - phone.left.toInt() - 15
+            val twoHeight = frameHeight - phone.top.toInt() - 15
+
+            val twoClip = Bitmap.createBitmap(Bitmap.createScaledBitmap(two.value!!, twoWidth, twoHeight - barHeight, true), 0, 65, twoWidth, twoHeight - 125 - 65)
+
+            images.add(ImageWithPosition(twoLeft, twoTop + barHeight, twoClip))
             val color = two.value!!.getPixel(two.value!!.width / 2, 1)
-            val bar_bg = Bitmap.createBitmap(two_width, 125, Bitmap.Config.ARGB_8888);
+            val barBg = Bitmap.createBitmap(twoWidth, barHeight, Bitmap.Config.ARGB_8888);
             if (computeContrastBetweenColors(color) < 3f) {
-                bar_bg.eraseColor(BackgroundColor.White)
-                images.add(ImageWithPosition(two_left, two_top, bar_bg))
-                images.add(ImageWithPosition(two_left, two_top, Bitmap.createScaledBitmap(blackBar, two_width, two_height, true)))
+                barBg.eraseColor(BackgroundColor.White)
+                images.add(ImageWithPosition(twoLeft, twoTop, barBg))
+                images.add(ImageWithPosition(twoLeft, twoTop + twoHeight - barHeight, barBg))
+                images.add(ImageWithPosition(twoLeft, twoTop, Bitmap.createScaledBitmap(blackBar, twoWidth, twoHeight, true)))
             } else {
-                bar_bg.eraseColor(BackgroundColor.Black)
-                images.add(ImageWithPosition(two_left, two_top, bar_bg))
-                images.add(ImageWithPosition(two_left, two_top, Bitmap.createScaledBitmap(whiteBar, two_width, two_height, true)))
+                barBg.eraseColor(BackgroundColor.Black)
+                images.add(ImageWithPosition(twoLeft, twoTop, barBg))
+                images.add(ImageWithPosition(twoLeft, twoTop + twoHeight - barHeight, barBg))
+                images.add(ImageWithPosition(twoLeft, twoTop, Bitmap.createScaledBitmap(whiteBar, twoWidth, twoHeight, true)))
             }
         }
         images.add(ImageWithPosition(padding_h / 2f, padding_top, Bitmap.createScaledBitmap(current, frameWidth, frameHeight, true)))
