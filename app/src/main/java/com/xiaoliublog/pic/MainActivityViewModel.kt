@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Environment
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -27,6 +28,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.time.microseconds
 
 class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
     private val _t3: Bitmap
@@ -142,6 +144,13 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     fun setTwo(bitmap: Bitmap?) {
         two.value = bitmap
         reRender()
+    }
+
+    fun showAbout(view: View){
+        view.animate()
+                .rotation(if (view.rotation == 90f) 0f else 90f)
+                .start()
+        Log.d(TAG, "showAbout: ")
     }
 
     companion object {
