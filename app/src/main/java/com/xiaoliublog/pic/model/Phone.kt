@@ -6,7 +6,9 @@ enum class PhoneColor {
     Green,
     White,
     Black,
-    Pink
+    Pink,
+    BlackOnWhite,
+    WhiteOnBlack
 }
 
 open class Phone {
