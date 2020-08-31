@@ -239,6 +239,16 @@
                 app:selectedColor="#2D4B0F" />
         </com.xiaoliublog.pic.ui.MyRadioButtonGroup>
 
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+            <ProgressBar
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="center"
+                android:visibility="@{viewmodel.loading?View.VISIBLE:View.GONE}" />
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

@@ -2,6 +2,7 @@ package com.xiaoliublog.pic
 
 import android.app.Application
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -33,13 +34,9 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     private val _t3: Bitmap
     private val noahOne = NoahOne(getApplication())
     private val noahTwo = NoahTwo(getApplication())
+    private var aspect = 1.86
 
-    var _width = MutableLiveData<Int>(2700)
-    var _height = MutableLiveData<Int>(5175)
-
-    var frameWidth = 1635
-    var frameHeight = 2883
-
+    val loading = MutableLiveData<Boolean>(true)
     private val _result = MutableLiveData<Bitmap>()
     private val two = MutableLiveData<Bitmap?>()
     private val _bgColor = MutableLiveData(BackgroundColor.Black)
@@ -56,10 +53,17 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     init {
         options.inDensity = DisplayMetrics.DENSITY_400
         _t3 = BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.pro2s_noah1_black, options)
+        val resources: Resources = getApplication<Application>().resources
+        val dm: DisplayMetrics = resources.displayMetrics
+        val width = dm.widthPixels
+        val height = dm.heightPixels
+        Log.d(TAG, "device: width=${width},height=${height},${height / width.toFloat()}")
+        aspect = (height / width.toFloat()).toDouble()
         reRender()
     }
 
     fun saveImg() {
+        loading.value = true
         Single.create { emitter: SingleEmitter<String?> ->
             val path = Environment.getExternalStorageDirectory().toString()
             val name = "Screenshot_" + Date().time + "_套壳截屏.png"
@@ -76,6 +80,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .doOnSuccess { ret -> Toast.makeText(getApplication(), ret, Toast.LENGTH_SHORT).show() }
                 .doOnError { throwable: Throwable? -> Toast.makeText(getApplication(), throwable?.message, Toast.LENGTH_SHORT).show() }
+                .doFinally { loading.value = false }
                 .subscribe()
     }
 
@@ -96,20 +101,19 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
                 if (frameColor == PhoneColor.Black) frameColor = PhoneColor.BlackOnWhite
             }
         }
-        val frame = currentPhone.colors.getOrDefault(frameColor, _t3)
-        frameHeight = currentPhone.height.toInt()
-        frameWidth = currentPhone.width.toInt()
+        val frameWidth = currentPhone.width.toInt()
+        var frameHeight = currentPhone.height.toInt()
+        if (!isTwo) frameHeight = (currentPhone.width * aspect).toInt()
         imageComposeBuilder.bgColor = bgColor
         imageComposeBuilder.width = frameWidth + padding_h
         imageComposeBuilder.height = frameHeight + padding_v
-        Log.d(TAG, "reRender: canvas width=${imageComposeBuilder.width},height=${imageComposeBuilder.height}. image width=${frameWidth},height=${frameHeight}")
 
         val images = ArrayList<ImageWithPosition>()
 
         val oldBarHeight = 55
         val newBarHeight = 105
         if (two.value != null) {
-            Log.d(TAG, "reRender: two width=${two.value!!.width},height=${two.value!!.height}")
+            if (!isTwo) currentPhone.top = frameHeight * currentPhone.topOfHeight
             val twoLeft = padding_h / 2f + currentPhone.left
             val twoTop = padding_top + currentPhone.top
             val twoWidth = frameWidth - currentPhone.left.toInt() * 2
@@ -143,15 +147,21 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
                 }
             }
         }
-        images.add(ImageWithPosition(padding_h / 2f, padding_top, Bitmap.createScaledBitmap(frame, frameWidth, frameHeight, true)))
+        val frame = currentPhone.load(frameColor)
+        if (frame != null) {
+            images.add(ImageWithPosition(padding_h / 2f, padding_top, Bitmap.createScaledBitmap(frame, frameWidth, frameHeight, true)))
+        }
         imageComposeBuilder.images = images
-        val res = imageComposeBuilder.combine()
-        Log.d(TAG, "reRender: result: width:${res.width},height:${res.height}")
-        return res
+        return imageComposeBuilder.combine()
     }
 
     fun reRender() {
-        _result.postValue(build(false))
+        Log.d(TAG, "reRender: ")
+        loading.postValue(true)
+        kotlin.run {
+            _result.postValue(build(false))
+        }
+        loading.postValue(false)
     }
 
     fun setBgColor(color: Int) {

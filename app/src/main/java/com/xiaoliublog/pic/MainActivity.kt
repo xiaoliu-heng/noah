@@ -27,7 +27,6 @@ import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
-    var options: BitmapFactory.Options? = null
     private val disposable = CompositeDisposable()
     private var _binding: ActivityMainBinding? = null
     private val binding
@@ -41,8 +40,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var displayMetrics: DisplayMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
 
         _model = ViewModelProvider(this).get(MainActivityViewModel::class.java)
         _binding = ActivityMainBinding.inflate(layoutInflater)
@@ -51,11 +48,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.viewmodel = model
         binding.lifecycleOwner = this
-        val scale = displayMetrics.density
-        model._width.value = (displayMetrics.widthPixels * scale + 0.5f).toInt()
-        model._height.value = (displayMetrics.heightPixels * scale + 0.5f).toInt()
 
-        model._width.observe(this, Observer { t -> model.reRender() })
         model.bg.observe(this, Observer { t -> model.reRender() })
         model.result.observe(this, Observer { res -> canvas?.setImageBitmap(res) })
 
@@ -70,9 +63,6 @@ class MainActivity : AppCompatActivity() {
                 imageUri.let { setBitmapFromUri(it) }
             }
         }
-
-        options = BitmapFactory.Options()
-        options!!.inDensity = DisplayMetrics.DENSITY_400
     }
 
     fun selectImg(view: View?) {
@@ -84,11 +74,12 @@ class MainActivity : AppCompatActivity() {
 
     fun shareImg(view: View?) {
         try {
-            val cachePath = File(getCacheDir(), "images")
+            model.loading.value = true
+            val cachePath = File(cacheDir, "images")
             cachePath.mkdirs() // don't forget to make the directory
-            val stream = FileOutputStream(cachePath.toString() + "/image.png") // overwrites this image every time
-            model.result.value!!.compress(Bitmap.CompressFormat.PNG, 100, stream)
-            val imagePath = File(getCacheDir(), "images")
+            val stream = FileOutputStream("$cachePath/image.png") // overwrites this image every time
+            model.build(true).compress(Bitmap.CompressFormat.PNG, 100, stream)
+            val imagePath = File(cacheDir, "images")
             val newFile = File(imagePath, "image.png")
             val contentUri = FileProvider.getUriForFile(this, "com.xiaoliublog.pic.fileprovider", newFile)
 
@@ -101,6 +92,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent.createChooser(shareIntent, "选择要分享的APP"))
             }
             stream.close()
+            model.loading.value = false
         } catch (e: IOException) {
             e.printStackTrace()
         }

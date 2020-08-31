@@ -28,24 +28,24 @@ class ImageCombiner(
         canvas.setBitmap(result)
         canvas.drawColor(bgColor)
         images.forEach(Consumer { i: ImageWithPosition -> canvas.drawBitmap(i.image, i.left, i.top, paint) })
-//        for (i in 0..width step 10) {
-//            if (i%100f==0f){
-//                paint.color = Color.GREEN
-//                canvas.drawPoint(i.toFloat(), height / 2f, paint)
-//            }else{
-//                paint.color = Color.RED
-//                canvas.drawPoint(i.toFloat(), height / 2f, paint)
-//            }
-//        }
-//        for (i in 0..height step 10) {
-//            if (i%100f==0f){
-//                paint.color = Color.GREEN
-//                canvas.drawPoint(width/2f, i.toFloat(), paint)
-//            }else{
-//                paint.color = Color.RED
-//                canvas.drawPoint(width/2f, i.toFloat(), paint)
-//            }
-//        }
+        for (i in 0..width step 10) {
+            if (i%100f==0f){
+                paint.color = Color.GREEN
+                canvas.drawPoint(i.toFloat(), height / 2f, paint)
+            }else{
+                paint.color = Color.RED
+                canvas.drawPoint(i.toFloat(), height / 2f, paint)
+            }
+        }
+        for (i in 0..height step 10) {
+            if (i%100f==0f){
+                paint.color = Color.GREEN
+                canvas.drawPoint(width/2f, i.toFloat(), paint)
+            }else{
+                paint.color = Color.RED
+                canvas.drawPoint(width/2f, i.toFloat(), paint)
+            }
+        }
         canvas.save()
         canvas.restore()
         return result
