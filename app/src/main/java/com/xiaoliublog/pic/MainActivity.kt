@@ -1,17 +1,22 @@
 package com.xiaoliublog.pic
 
+import android.animation.AnimatorSet
+import android.animation.ValueAnimator
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.os.Parcelable
-import android.util.DisplayMetrics
 import android.util.Log
+import android.view.SurfaceView
 import android.view.View
-import android.view.WindowManager
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.animation.doOnEnd
 import androidx.core.content.FileProvider
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
@@ -19,6 +24,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.xiaoliublog.pic.databinding.ActivityMainBinding
 import com.xiaoliublog.pic.ui.MyImageView
+import com.yuyashuai.frameanimation.FrameAnimation
+import com.yuyashuai.frameanimation.FrameAnimation.RepeatMode
 import io.reactivex.disposables.CompositeDisposable
 import java.io.File
 import java.io.FileOutputStream
@@ -36,7 +43,8 @@ class MainActivity : AppCompatActivity() {
     private val model
         get() = _model!!
 
-    private var canvas:ImageView? = null;
+    private var canvas: ImageView? = null
+    var frameAnimation: FrameAnimation? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +53,44 @@ class MainActivity : AppCompatActivity() {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         canvas = findViewById(R.id.canvas)
+
+        val textureView: SurfaceView = findViewById(R.id.splash)
+        val splashBg: LinearLayout = findViewById(R.id.splash_bg)
+        splashBg.setBackgroundColor(Color.BLACK)
+        splashBg.alpha = 1f
+        frameAnimation = FrameAnimation(textureView)
+        frameAnimation!!.setRepeatMode(RepeatMode.ONCE)
+        frameAnimation!!.setScaleType(FrameAnimation.ScaleType.FIT_CENTER)
+
+        fun hideSplash() {
+            textureView.visibility = View.GONE
+            val colorAnimator: ValueAnimator = ValueAnimator.ofArgb(Color.BLACK, BackgroundColor.White).apply {
+                addUpdateListener { animation ->
+                    splashBg.setBackgroundColor(animation.animatedValue as Int)
+                }
+            }
+            val alphaAnimator = ValueAnimator.ofFloat(1f, 0f).apply {
+                addUpdateListener { animation ->
+                    splashBg.alpha = animation.animatedValue as Float
+                }
+            }
+            AnimatorSet().apply {
+                play(colorAnimator)
+                play(alphaAnimator)
+                duration = 1000
+                doOnEnd { splashBg.visibility = View.GONE }
+                start()
+            }
+        }
+
+        val handler = Handler()
+        val runnable = Runnable { hideSplash() }
+        handler.postDelayed(runnable, 6006)
+
+        textureView.setOnClickListener(View.OnClickListener { v: View? ->
+            handler.removeCallbacks(runnable)
+            hideSplash()
+        })
 
         binding.viewmodel = model
         binding.lifecycleOwner = this
@@ -63,6 +109,16 @@ class MainActivity : AppCompatActivity() {
                 imageUri.let { setBitmapFromUri(it) }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        frameAnimation!!.playAnimationFromAssets("splash")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        frameAnimation!!.stopAnimation()
     }
 
     fun selectImg(view: View?) {
@@ -127,16 +183,19 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         disposable.clear()
         _binding = null
+        frameAnimation!!.stopAnimation()
     }
 
     companion object {
         private const val IMAGE_PICKER = 99
         private const val TAG = "hyl"
+
         @JvmStatic
         @BindingAdapter("bitmap")
         fun setBitmap(imageView: MyImageView, src: Bitmap?) {
             imageView.setImageBitmap(src)
         }
+
         @JvmStatic
         @BindingAdapter("background_color")
         fun setBgColor(view: View, color: LiveData<Int?>) {

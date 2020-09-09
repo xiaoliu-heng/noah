@@ -13,6 +13,7 @@ import android.util.AttributeSet;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatRadioButton;
 
+import com.xiaoliublog.pic.BackgroundColor;
 import com.xiaoliublog.pic.R;
 
 public class MyRadioButton extends AppCompatRadioButton {
@@ -21,7 +22,6 @@ public class MyRadioButton extends AppCompatRadioButton {
     private int selectedColor = Color.WHITE;
     private int shapeFlag = 0;
     private float mPadding = 1;
-    private ValueAnimator animator;
 
     public MyRadioButton(Context context) {
         super(context);
@@ -46,8 +46,8 @@ public class MyRadioButton extends AppCompatRadioButton {
         init();
     }
 
-    private void init(){
-        Shader shader = new LinearGradient(0,0,getWidth(),getHeight(),selectedColor,Color.WHITE,Shader.TileMode.CLAMP);
+    private void init() {
+        Shader shader = new LinearGradient(getWidth() / 2f, 0, getWidth() / 2f, getHeight(), selectedColor, BackgroundColor.White, Shader.TileMode.CLAMP);
         mPaint.setShader(shader);
         mPaint.setColor(selectedColor);
         borderPaint.setStyle(Paint.Style.STROKE);
@@ -58,8 +58,8 @@ public class MyRadioButton extends AppCompatRadioButton {
 
     @Override
     public void setChecked(boolean checked) {
-        animator = ValueAnimator
-                .ofFloat(checked ? 5 : 1, checked ? 1: 5)
+        ValueAnimator animator = ValueAnimator
+                .ofFloat(checked ? 5 : 1, checked ? 1 : 5)
                 .setDuration(200);
         animator.addUpdateListener(animation -> {
             mPadding = (float) animation.getAnimatedValue();
@@ -72,12 +72,12 @@ public class MyRadioButton extends AppCompatRadioButton {
     @Override
     protected void onDraw(Canvas canvas) {
         mPaint.setStrokeWidth(2f);
-        if (shapeFlag==0){
-            canvas.drawRoundRect(mPadding, mPadding*2, getWidth() - mPadding, getHeight() - mPadding*2, 15-mPadding, 15-mPadding, mPaint);
-            canvas.drawRoundRect(mPadding, mPadding*2, getWidth() - mPadding, getHeight() - mPadding*2, 15-mPadding, 15-mPadding, borderPaint);
-        }else {
-            canvas.drawCircle(getWidth()/2f,getHeight()/2f,(getWidth()-mPadding)/2f-2, mPaint);
-            canvas.drawCircle(getWidth()/2f,getHeight()/2f,(getWidth()-mPadding)/2f-2, borderPaint);
+        if (shapeFlag == 0) {
+            canvas.drawRoundRect(mPadding, mPadding * 2, getWidth() - mPadding, getHeight() - mPadding * 2, 15 - mPadding, 15 - mPadding, mPaint);
+            canvas.drawRoundRect(mPadding, mPadding * 2, getWidth() - mPadding, getHeight() - mPadding * 2, 15 - mPadding, 15 - mPadding, borderPaint);
+        } else {
+            canvas.drawCircle(getWidth() / 2f, getHeight() / 2f, (getWidth() - mPadding) / 2f - 2, mPaint);
+            canvas.drawCircle(getWidth() / 2f, getHeight() / 2f, (getWidth() - mPadding) / 2f - 2, borderPaint);
         }
     }
 

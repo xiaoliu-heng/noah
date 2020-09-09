@@ -10,11 +10,11 @@ class NoahTwo(override var context: Context) : Phone(context) {
                 PhoneColor.Black to R.drawable.noah2_black_black,
                 PhoneColor.White to R.drawable.noah2_white_white,
                 PhoneColor.BlackOnWhite to R.drawable.noah2_black_white,
-                PhoneColor.WhiteOnBlack to R.drawable.noah2_white_black
+                PhoneColor.WhiteOnBlack to R.drawable.noah2_white_white
         )
         left = 790f
         top = 430f
-        width = 2200f
-        height = 2200f
+        width = 2157f
+        height = 3890f
     }
 }

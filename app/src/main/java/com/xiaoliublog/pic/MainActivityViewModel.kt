@@ -39,13 +39,14 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     val loading = MutableLiveData<Boolean>(true)
     private val _result = MutableLiveData<Bitmap>()
     private val two = MutableLiveData<Bitmap?>()
-    private val _bgColor = MutableLiveData(BackgroundColor.Black)
-    private val fgColor = MutableLiveData<PhoneColor>(PhoneColor.Black)
+    private val _bgColor = MutableLiveData(BackgroundColor.White)
+    private val fgColor = MutableLiveData<PhoneColor>(PhoneColor.White)
     private val options = BitmapFactory.Options()
 
-    private val _phone = MutableLiveData<Phone>(noahOne)
+    private val _phone = MutableLiveData<Phone>(noahTwo)
 
     val bg = _bgColor
+    val fg = fgColor;
     val result: LiveData<Bitmap> = _result
     val isDark: Boolean = _bgColor.value?.equals(BackgroundColor.Black) ?: true
     val phone: LiveData<Phone> = _phone

@@ -25,6 +25,14 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
+        <ImageView
+            android:id="@+id/canvas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:contentDescription="@string/content_image_desc" />
+
+        <!--  TOP Menu      -->
         <com.google.android.flexbox.FlexboxLayout
             background_color="@{viewmodel.bg}"
             android:layout_width="match_parent"
@@ -86,13 +94,6 @@
 
 
         </com.google.android.flexbox.FlexboxLayout>
-
-        <ImageView
-            android:id="@+id/canvas"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:contentDescription="@string/content_image_desc" />
 
         <RelativeLayout
             android:id="@+id/dock"
@@ -201,7 +202,6 @@
         <com.xiaoliublog.pic.ui.MyRadioButtonGroup
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checkedButton="@id/btn_fg_black"
             android:orientation="horizontal"
             app:layout_anchor="@id/dock"
             app:layout_anchorGravity="center_horizontal"
@@ -211,14 +211,15 @@
                 android:layout_width="20dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="10dp"
+                android:checked="@{viewmodel.fg == PhoneColor.White}"
                 android:onClick="@{() -> viewmodel.setFgColor(PhoneColor.White)}"
                 app:selectedColor="#FEFFFE" />
 
             <com.xiaoliublog.pic.ui.MyRadioButton
-                android:id="@+id/btn_fg_black"
                 android:layout_width="20dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="10dp"
+                android:checked="@{viewmodel.fg == PhoneColor.Black}"
                 android:onClick="@{() -> viewmodel.setFgColor(PhoneColor.Black)}"
                 app:selectedColor="#2C2C2C" />
 
@@ -226,6 +227,7 @@
                 android:layout_width="20dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="10dp"
+                android:checked="@{viewmodel.fg == PhoneColor.Pink}"
                 android:onClick="@{() -> viewmodel.setFgColor(PhoneColor.Pink)}"
                 android:visibility="@{viewmodel.phone instanceof NoahTwo ? View.GONE : View.VISIBLE}"
                 app:selectedColor="#FEA6A3" />
@@ -234,6 +236,7 @@
                 android:layout_width="20dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="10dp"
+                android:checked="@{viewmodel.fg == PhoneColor.Green}"
                 android:onClick="@{() -> viewmodel.setFgColor(PhoneColor.Green)}"
                 android:visibility="@{viewmodel.phone instanceof NoahTwo ? View.GONE : View.VISIBLE}"
                 app:selectedColor="#2D4B0F" />
@@ -241,14 +244,26 @@
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
+            android:layout_height="match_parent">
+
             <ProgressBar
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:layout_gravity="center"
                 android:visibility="@{viewmodel.loading?View.VISIBLE:View.GONE}" />
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+        <LinearLayout
+            android:id="@+id/splash_bg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <SurfaceView
+                android:id="@+id/splash"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

@@ -14,27 +14,21 @@
         android:allowBackup="true"
         android:fullBackupContent="false"
         android:hardwareAccelerated="false"
-        android:icon="@mipmap/icon_noah"
+        android:icon="@mipmap/ic_launcher_foreground"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/icon_noah"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
         <activity
-            android:name=".SplashActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/SplashTheme">
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".MainActivity"
-            android:screenOrientation="portrait"
-            >
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 
