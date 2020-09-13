@@ -31,14 +31,13 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
-    private val _t3: Bitmap
     private val noahOne = NoahOne(getApplication())
     private val noahTwo = NoahTwo(getApplication())
     private var aspect = 1.86
 
     val loading = MutableLiveData<Boolean>(true)
     private val _result = MutableLiveData<Bitmap>()
-    private val two = MutableLiveData<Bitmap?>()
+    private val content = MutableLiveData<Bitmap?>()
     private val _bgColor = MutableLiveData(BackgroundColor.White)
     private val fgColor = MutableLiveData<PhoneColor>(PhoneColor.White)
     private val options = BitmapFactory.Options()
@@ -48,12 +47,12 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     val bg = _bgColor
     val fg = fgColor;
     val result: LiveData<Bitmap> = _result
-    val isDark: Boolean = _bgColor.value?.equals(BackgroundColor.Black) ?: true
+    val isDark: LiveData<Boolean>
+        get() = MutableLiveData<Boolean>(_bgColor.value!! == BackgroundColor.Black)
     val phone: LiveData<Phone> = _phone
 
     init {
         options.inDensity = DisplayMetrics.DENSITY_400
-        _t3 = BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.pro2s_noah1_black, options)
         val resources: Resources = getApplication<Application>().resources
         val dm: DisplayMetrics = resources.displayMetrics
         val width = dm.widthPixels
@@ -88,69 +87,70 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     fun build(export: Boolean? = false): Bitmap {
         val currentPhone = _phone.value!!
         val isTwo: Boolean = currentPhone is NoahTwo
-        val padding_h = if (isTwo) 0 else 600
-        val padding_v = if (isTwo) 0 else 800
-        val padding_top = if (export == true) padding_v / 2f else padding_v / 4f
+        val paddingX = if (isTwo) 0 else 957
+        val paddingY = if (isTwo) 0 else 1400
         val imageComposeBuilder = ImageCombiner()
         val bgColor = bg.value!!
         var frameColor = fgColor.value!!
         if (isTwo) {
-            if (bgColor == BackgroundColor.Black) {
+            if (isDark.value!!) {
                 if (frameColor == PhoneColor.White) frameColor = PhoneColor.WhiteOnBlack
-            }
-            if (bgColor == BackgroundColor.White) {
-                if (frameColor == PhoneColor.Black) frameColor = PhoneColor.BlackOnWhite
+            } else if (frameColor == PhoneColor.Black) {
+                frameColor = PhoneColor.BlackOnWhite
             }
         }
-        val frameWidth = currentPhone.width.toInt()
-        var frameHeight = currentPhone.height.toInt()
-        if (!isTwo) frameHeight = (currentPhone.width * aspect).toInt()
+        val frameWidth = (currentPhone.width - paddingX).toInt()
+        val frameHeight = (currentPhone.height - paddingY).toInt()
+
         imageComposeBuilder.bgColor = bgColor
-        imageComposeBuilder.width = frameWidth + padding_h
-        imageComposeBuilder.height = frameHeight + padding_v
+        imageComposeBuilder.width = frameWidth + paddingX
+        imageComposeBuilder.height = frameHeight + paddingY
 
         val images = ArrayList<ImageWithPosition>()
 
-        val oldBarHeight = 55
-        val newBarHeight = 105
-        if (two.value != null) {
+        val oldBarHeight = 65
+        val newBarHeight = 125
+        if (content.value != null) {
+
             if (!isTwo) currentPhone.top = frameHeight * currentPhone.topOfHeight
-            val twoLeft = padding_h / 2f + currentPhone.left
-            val twoTop = padding_top + currentPhone.top
-            val twoWidth = frameWidth - currentPhone.left.toInt() * 2
-            val twoHeight = frameHeight - currentPhone.top.toInt() * 2
+            val contentLeft = paddingX / 2f + currentPhone.left
+            val contentTop = paddingY / 2f + currentPhone.top
+            val contentWidth = frameWidth - currentPhone.left.toInt() * 2
+            val contentHeight = frameHeight - currentPhone.top.toInt() * 2
 
             if (isTwo) {
-                val content = Bitmap.createScaledBitmap(two.value!!, twoWidth, twoHeight, true)
-                images.add(ImageWithPosition(twoLeft, twoTop, content))
+                Log.d(TAG, "build: Two")
+                val content = Bitmap.createScaledBitmap(content.value!!, contentWidth, contentHeight, true)
+                images.add(ImageWithPosition(contentLeft, contentTop, content))
             } else {
-                val twoClip = Bitmap.createBitmap(Bitmap.createScaledBitmap(two.value!!, twoWidth, twoHeight, true), 0, oldBarHeight, twoWidth, twoHeight - oldBarHeight)
-                val content = Bitmap.createScaledBitmap(twoClip, twoWidth, twoHeight - newBarHeight * 2, true)
-                images.add(ImageWithPosition(twoLeft, twoTop + newBarHeight, content))
+                Log.d(TAG, "build: One")
+                val twoClip = Bitmap.createBitmap(Bitmap.createScaledBitmap(content.value!!, contentWidth, contentHeight, true), 0, oldBarHeight, contentWidth, contentHeight - oldBarHeight)
+                val content = Bitmap.createScaledBitmap(twoClip, contentWidth, contentHeight - newBarHeight * 2, true)
+                images.add(ImageWithPosition(contentLeft, contentTop + newBarHeight, content))
             }
 
-
             if (!isTwo) {
-                val color = two.value!!.getPixel(two.value!!.width / 2, 1)
-                val barBg = Bitmap.createBitmap(twoWidth, newBarHeight, Bitmap.Config.ARGB_8888)
+                val color = content.value!!.getPixel(content.value!!.width / 2, 1)
+                val barBg = Bitmap.createBitmap(contentWidth, newBarHeight, Bitmap.Config.ARGB_8888)
                 if (computeContrastBetweenColors(color) < 3f) {
                     val blackBar = BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bar_black, options)
                     barBg.eraseColor(BackgroundColor.White)
-                    images.add(ImageWithPosition(twoLeft, twoTop, barBg))
-                    images.add(ImageWithPosition(twoLeft, twoTop + twoHeight - newBarHeight, barBg))
-                    images.add(ImageWithPosition(twoLeft, twoTop + 5, Bitmap.createScaledBitmap(blackBar, twoWidth, twoHeight - 5, true)))
+                    images.add(ImageWithPosition(contentLeft, contentTop, barBg))
+                    images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - newBarHeight, barBg))
+                    images.add(ImageWithPosition(contentLeft + 5, contentTop + 5, Bitmap.createScaledBitmap(blackBar, contentWidth - 5, contentHeight - 5, true)))
                 } else {
                     val whiteBar = BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bar_white, options)
                     barBg.eraseColor(BackgroundColor.Black)
-                    images.add(ImageWithPosition(twoLeft, twoTop, barBg))
-                    images.add(ImageWithPosition(twoLeft, twoTop + twoHeight - newBarHeight, barBg))
-                    images.add(ImageWithPosition(twoLeft, twoTop + 5, Bitmap.createScaledBitmap(whiteBar, twoWidth, twoHeight - 5, true)))
+                    images.add(ImageWithPosition(contentLeft, contentTop, barBg))
+                    images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - newBarHeight, barBg))
+                    images.add(ImageWithPosition(contentLeft + 5, contentTop + 5, Bitmap.createScaledBitmap(whiteBar, contentWidth - 5, contentHeight - 5, true)))
                 }
             }
         }
+
         val frame = currentPhone.load(frameColor)
         if (frame != null) {
-            images.add(ImageWithPosition(padding_h / 2f, padding_top, Bitmap.createScaledBitmap(frame, frameWidth, frameHeight, true)))
+            images.add(ImageWithPosition(paddingX / 2f, paddingY / 2f, Bitmap.createScaledBitmap(frame, frameWidth, frameHeight, true)))
         }
         imageComposeBuilder.images = images
         return imageComposeBuilder.combine()
@@ -178,7 +178,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun setTwo(bitmap: Bitmap?) {
-        two.value = bitmap
+        content.value = bitmap
         reRender()
     }
 
@@ -206,13 +206,6 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         animation(view)
         _phone.value = noahTwo
         reRender()
-    }
-
-    fun showAbout(view: View) {
-        view.animate()
-                .rotation(if (view.rotation == 90f) 0f else 90f)
-                .start()
-        Log.d(TAG, "showAbout: ")
     }
 
     companion object {

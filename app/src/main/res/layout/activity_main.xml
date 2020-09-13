@@ -27,14 +27,13 @@
 
         <ImageView
             android:id="@+id/canvas"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="0dp"
-            android:contentDescription="@string/content_image_desc" />
+            android:contentDescription="@string/content_image_desc"
+            android:scaleType="fitStart" />
 
         <!--  TOP Menu      -->
         <com.google.android.flexbox.FlexboxLayout
-            background_color="@{viewmodel.bg}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@{viewmodel.isDark?@drawable/border_dark:@drawable/border_light}"
@@ -51,7 +50,7 @@
                     android:background="@color/transparent"
                     android:onClick="@{(v)->viewmodel.switchNoah1(v)}"
                     android:paddingStart="10dp"
-                    android:scaleType="fitXY"
+                    android:scaleType="fitCenter"
                     android:src="@{viewmodel.isDark?@drawable/noah1_icon_dark:@drawable/noah1_icon_light}"
                     tools:ignore="RtlSymmetry" />
 
@@ -69,9 +68,17 @@
                     android:background="@color/transparent"
                     android:onClick="@{(v)->viewmodel.switchNoah2(v)}"
                     android:paddingEnd="10dp"
-                    android:scaleType="fitXY"
+                    android:scaleType="fitCenter"
                     android:src="@{viewmodel.isDark?@drawable/noah2_icon_dark:@drawable/noah2_icon_light}"
                     tools:ignore="RtlSymmetry" />
+
+                <ImageButton
+                    android:layout_width="3dp"
+                    android:layout_height="34dp"
+                    android:layout_marginStart="0dp"
+                    android:background="@color/transparent"
+                    android:scaleType="fitCenter"
+                    android:src="@{viewmodel.isDark?@drawable/icon_split_dark:@drawable/icon_split_light}" />
 
             </com.google.android.flexbox.FlexboxLayout>
 
@@ -85,8 +92,8 @@
                     android:layout_width="32dp"
                     android:layout_height="34dp"
                     android:background="@color/transparent"
-                    android:onClick="@{(v)->viewmodel.showAbout(v)}"
-                    android:scaleType="fitXY"
+                    android:onClick="toggleAbout"
+                    android:scaleType="fitCenter"
                     android:src="@{viewmodel.isDark?@drawable/icon_menu_dark:@drawable/icon_menu_light}"
                     tools:ignore="RtlSymmetry" />
 
@@ -146,15 +153,6 @@
                         app:selectedColor="#E6E6E6"
                         app:shape="circle" />
 
-                    <com.xiaoliublog.pic.ui.MyRadioButton
-                        android:id="@+id/radio_transparent"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:button="@null"
-                        android:onClick="@{()->viewmodel.setBgColor(BackgroundColor.Transparent)}"
-                        android:visibility="@{viewmodel.phone instanceof NoahTwo ? View.GONE : View.VISIBLE}"
-                        app:selectedColor="@color/transparent"
-                        app:shape="circle" />
                 </com.google.android.flexbox.FlexboxLayout>
             </RadioGroup>
 
@@ -242,28 +240,101 @@
                 app:selectedColor="#2D4B0F" />
         </com.xiaoliublog.pic.ui.MyRadioButtonGroup>
 
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <ProgressBar
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="center"
+            android:visibility="@{viewmodel.loading?View.VISIBLE:View.GONE}" />
 
-            <ProgressBar
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_gravity="center"
-                android:visibility="@{viewmodel.loading?View.VISIBLE:View.GONE}" />
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-
+        <!--   About     -->
         <LinearLayout
-            android:id="@+id/splash_bg"
+            android:id="@+id/about"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginTop="124dp"
+            android:alpha="0"
+            android:background="#e7e7e7"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
 
-            <SurfaceView
-                android:id="@+id/splash"
+            <ImageView
+                android:layout_width="250dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:src="@drawable/icon_about_logo" />
+
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/oppo_sans_bold"
+                android:text="更多详情请访问:WWW.NOAHCONCEPT.COM"
+                android:textAlignment="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/oppo_sans_bold"
+                android:text="本软件不保证在未经测试的设备上的兼容性"
+                android:textAlignment="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="@font/oppo_sans_bold"
+                android:text="工业设计: 周文正/陈冉"
+                android:textAlignment="textStart" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="@font/oppo_sans_bold"
+                android:text="宣传视频: 陈冉"
+                android:textAlignment="textStart" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginBottom="60dp"
+                android:fontFamily="@font/oppo_sans_bold"
+                android:text="字体设计: 徐飞航"
+                android:textAlignment="textStart" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginBottom="40dp"
+                android:fontFamily="@font/oppo_sans_bold"
+                android:text="手机端软件: 衡俊青/衡玉良"
+                android:textAlignment="textStart" />
+
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/splash_first"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/splash_first"
+            android:visibility="gone" />
+
+        <TextureView
+            android:id="@+id/splash"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="1" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

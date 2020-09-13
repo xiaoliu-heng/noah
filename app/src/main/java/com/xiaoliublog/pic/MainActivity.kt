@@ -1,23 +1,21 @@
 package com.xiaoliublog.pic
 
-import android.animation.AnimatorSet
-import android.animation.ValueAnimator
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.os.Parcelable
 import android.util.Log
-import android.view.SurfaceView
+import android.view.TextureView
 import android.view.View
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.animation.doOnEnd
 import androidx.core.content.FileProvider
+import androidx.core.content.edit
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -30,6 +28,8 @@ import io.reactivex.disposables.CompositeDisposable
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.util.*
+import kotlin.concurrent.timerTask
 
 
 class MainActivity : AppCompatActivity() {
@@ -44,52 +44,74 @@ class MainActivity : AppCompatActivity() {
         get() = _model!!
 
     private var canvas: ImageView? = null
-    var frameAnimation: FrameAnimation? = null
+    private lateinit var splashView: TextureView
+    private lateinit var splashFirst: ImageView
+    private lateinit var aboutPage: LinearLayout
+    private var frameAnimation: FrameAnimation? = null
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN)
         super.onCreate(savedInstanceState)
 
         _model = ViewModelProvider(this).get(MainActivityViewModel::class.java)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         canvas = findViewById(R.id.canvas)
+        sharedPreferences = getSharedPreferences("com.xiaoliublog.pic", MODE_PRIVATE)
 
-        val textureView: SurfaceView = findViewById(R.id.splash)
-        val splashBg: LinearLayout = findViewById(R.id.splash_bg)
-        splashBg.setBackgroundColor(Color.BLACK)
-        splashBg.alpha = 1f
-        frameAnimation = FrameAnimation(textureView)
+        splashView = findViewById(R.id.splash)
+        splashFirst = findViewById(R.id.splash_first)
+        aboutPage = findViewById(R.id.about)
+        frameAnimation = FrameAnimation(splashView)
         frameAnimation!!.setRepeatMode(RepeatMode.ONCE)
         frameAnimation!!.setScaleType(FrameAnimation.ScaleType.FIT_CENTER)
+        frameAnimation!!.freezeLastFrame(true)
+        frameAnimation!!.setSupportInBitmap(true)
 
         fun hideSplash() {
-            textureView.visibility = View.GONE
-            val colorAnimator: ValueAnimator = ValueAnimator.ofArgb(Color.BLACK, BackgroundColor.White).apply {
-                addUpdateListener { animation ->
-                    splashBg.setBackgroundColor(animation.animatedValue as Int)
+            splashView.animate()
+                    .alpha(0f)
+                    .withEndAction {
+                        frameAnimation!!.stopAnimation()
+                        splashView.visibility = View.GONE
+                    }
+                    .setDuration(500)
+                    .start()
+        }
+
+        val firstRun = sharedPreferences.getBoolean("firstRun", true)
+
+        Log.d(TAG, "onCreate: firstRun=$firstRun")
+
+        if (firstRun) {
+            splashFirst.visibility = View.VISIBLE
+        }
+
+        splashView.setOnClickListener {
+            if (firstRun) {
+                frameAnimation!!.playAnimationFromAssets("splash2")
+                Timer("hide splash first", false)
+                        .schedule(timerTask { runOnUiThread { splashFirst.visibility = View.GONE } }, 200)
+                sharedPreferences.edit {
+                    putBoolean("firstRun", false)
+                    commit()
                 }
-            }
-            val alphaAnimator = ValueAnimator.ofFloat(1f, 0f).apply {
-                addUpdateListener { animation ->
-                    splashBg.alpha = animation.animatedValue as Float
-                }
-            }
-            AnimatorSet().apply {
-                play(colorAnimator)
-                play(alphaAnimator)
-                duration = 1000
-                doOnEnd { splashBg.visibility = View.GONE }
-                start()
+            } else {
+                hideSplash()
             }
         }
 
-        val handler = Handler()
-        val runnable = Runnable { hideSplash() }
-        handler.postDelayed(runnable, 6006)
+        frameAnimation!!.setAnimationListener(object : FrameAnimation.FrameAnimationListener {
+            override fun onAnimationEnd() {
+                hideSplash()
+            }
 
-        textureView.setOnClickListener(View.OnClickListener { v: View? ->
-            handler.removeCallbacks(runnable)
-            hideSplash()
+            override fun onAnimationStart() {}
+
+            override fun onProgress(progress: Float, frameIndex: Int, totalFrames: Int) {}
+
         })
 
         binding.viewmodel = model
@@ -111,9 +133,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun toggleAbout(view: View?) {
+        if (aboutPage.alpha == 0f) aboutPage.visibility = View.VISIBLE
+        aboutPage.animate()
+                .alpha(if (aboutPage.alpha == .9f) 0f else .9f)
+                .withEndAction { if (aboutPage.alpha == 0f) aboutPage.visibility = View.GONE }
+                .start()
+        view!!.animate()
+                .rotation(if (view.rotation == 90f) 0f else 90f)
+                .start()
+    }
+
     override fun onResume() {
         super.onResume()
-        frameAnimation!!.playAnimationFromAssets("splash")
+        if (!sharedPreferences.getBoolean("firstRun", true)) {
+            frameAnimation!!.playAnimationFromAssets("splash")
+        }
     }
 
     override fun onPause() {
