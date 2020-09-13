@@ -1,17 +1,13 @@
 package com.xiaoliublog.pic
 
 import android.app.Application
-import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.net.Uri
-import android.os.Environment
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -21,14 +17,6 @@ import com.xiaoliublog.pic.model.Phone
 import com.xiaoliublog.pic.model.PhoneColor
 import com.xiaoliublog.pic.utils.ImageCombiner
 import com.xiaoliublog.pic.utils.ImageWithPosition
-import io.reactivex.Single
-import io.reactivex.SingleEmitter
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import java.io.FileOutputStream
-import java.io.IOException
-import java.util.*
-import kotlin.collections.ArrayList
 
 class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
     private val noahOne = NoahOne(getApplication())
@@ -60,28 +48,6 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         Log.d(TAG, "device: width=${width},height=${height},${height / width.toFloat()}")
         aspect = (height / width.toFloat()).toDouble()
         reRender()
-    }
-
-    fun saveImg() {
-        loading.value = true
-        Single.create { emitter: SingleEmitter<String?> ->
-            val path = Environment.getExternalStorageDirectory().toString()
-            val name = "Screenshot_" + Date().time + "_套壳截屏.png"
-            val filename = "$path/Pictures/Screenshots/$name"
-            try {
-                FileOutputStream(filename).use { out ->
-                    build(true).compress(Bitmap.CompressFormat.PNG, 100, out)
-                    getApplication<Application>().sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://$filename")))
-                    emitter.onSuccess("保存成功")
-                }
-            } catch (e: IOException) {
-                emitter.onError(e)
-            }
-        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .doOnSuccess { ret -> Toast.makeText(getApplication(), ret, Toast.LENGTH_SHORT).show() }
-                .doOnError { throwable: Throwable? -> Toast.makeText(getApplication(), throwable?.message, Toast.LENGTH_SHORT).show() }
-                .doFinally { loading.value = false }
-                .subscribe()
     }
 
     fun build(export: Boolean? = false): Bitmap {

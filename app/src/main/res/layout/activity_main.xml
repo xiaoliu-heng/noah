@@ -182,7 +182,7 @@
                         android:layout_height="30dp"
                         android:background="@{viewmodel.isDark?@drawable/dock_save_dark:@drawable/dock_save_light}"
                         android:button="@null"
-                        android:onClick="@{()->viewmodel.saveImg()}" />
+                        android:onClick="saveImg" />
 
                     <androidx.appcompat.widget.AppCompatRadioButton
                         android:id="@+id/btn_share"

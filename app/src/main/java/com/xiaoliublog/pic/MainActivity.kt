@@ -1,11 +1,13 @@
 package com.xiaoliublog.pic
 
+import android.Manifest
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.os.Parcelable
 import android.util.Log
 import android.view.TextureView
@@ -13,6 +15,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.content.edit
@@ -24,7 +27,13 @@ import com.xiaoliublog.pic.databinding.ActivityMainBinding
 import com.xiaoliublog.pic.ui.MyImageView
 import com.yuyashuai.frameanimation.FrameAnimation
 import com.yuyashuai.frameanimation.FrameAnimation.RepeatMode
+import io.reactivex.Single
+import io.reactivex.SingleEmitter
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
+import pub.devrel.easypermissions.AfterPermissionGranted
+import pub.devrel.easypermissions.EasyPermissions
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -144,6 +153,34 @@ class MainActivity : AppCompatActivity() {
                 .start()
     }
 
+    @AfterPermissionGranted(Storage_Code)
+    fun saveImg(view: View?) {
+        val perms = arrayOf<String>(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        if (EasyPermissions.hasPermissions(this, *perms)) {
+            model.loading.value = true
+            Single.create { emitter: SingleEmitter<String?> ->
+                val path = Environment.getExternalStorageDirectory().toString()
+                val name = "Screenshot_" + Date().time + "_套壳截屏.png"
+                val filename = "$path/Pictures/Screenshots/$name"
+                try {
+                    FileOutputStream(filename).use { out ->
+                        model.build(true).compress(Bitmap.CompressFormat.PNG, 100, out)
+                        sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://$filename")))
+                        emitter.onSuccess("保存成功")
+                    }
+                } catch (e: IOException) {
+                    emitter.onError(e)
+                }
+            }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                    .doOnSuccess { ret -> Toast.makeText(this, ret, Toast.LENGTH_SHORT).show() }
+                    .doOnError { throwable: Throwable? -> Toast.makeText(this, throwable?.message, Toast.LENGTH_SHORT).show() }
+                    .doFinally { model.loading.value = false }
+                    .subscribe()
+        } else {
+            EasyPermissions.requestPermissions(this, "需要储存权限", Storage_Code, *perms)
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         if (!sharedPreferences.getBoolean("firstRun", true)) {
@@ -212,6 +249,13 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == IMAGE_PICKER && data != null) {
             setBitmapFromUri(data.data)
         }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
     }
 
     override fun onDestroy() {
