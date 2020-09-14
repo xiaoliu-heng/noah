@@ -165,7 +165,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
     fun setFgColor(color: PhoneColor) {
         Log.d(TAG, "setFgColor: $color")
-        this.fg.postValue(color)
+        this.fg.value = color
         reRender()
     }
 
