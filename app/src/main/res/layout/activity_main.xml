@@ -253,7 +253,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="124dp"
             android:alpha="0"
-            android:background="#e7e7e7"
+            background_color="@{viewmodel.bg}"
             android:orientation="vertical"
             android:visibility="gone"
             tools:visibility="visible">
@@ -327,8 +327,8 @@
             android:id="@+id/splash_first"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/splash_first"
-            android:visibility="gone" />
+            android:src="@drawable/bg_white"
+            android:visibility="visible" />
 
         <TextureView
             android:id="@+id/splash"

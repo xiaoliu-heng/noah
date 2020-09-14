@@ -12,19 +12,16 @@ import android.os.Parcelable
 import android.util.Log
 import android.view.TextureView
 import android.view.View
-import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.content.edit
-import androidx.databinding.BindingAdapter
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.xiaoliublog.pic.databinding.ActivityMainBinding
-import com.xiaoliublog.pic.ui.MyImageView
+import com.xiaoliublog.pic.utils.getDeviceName
 import com.yuyashuai.frameanimation.FrameAnimation
 import com.yuyashuai.frameanimation.FrameAnimation.RepeatMode
 import io.reactivex.Single
@@ -52,19 +49,20 @@ class MainActivity : AppCompatActivity() {
     private val model
         get() = _model!!
 
-    private var canvas: ImageView? = null
+    private lateinit var canvas: ImageView
     private lateinit var splashView: TextureView
     private lateinit var splashFirst: ImageView
     private lateinit var aboutPage: LinearLayout
-    private var frameAnimation: FrameAnimation? = null
+    private lateinit var frameAnimation: FrameAnimation
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN)
         super.onCreate(savedInstanceState)
 
         _model = ViewModelProvider(this).get(MainActivityViewModel::class.java)
+
+        setDevice()
+
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         canvas = findViewById(R.id.canvas)
@@ -74,33 +72,29 @@ class MainActivity : AppCompatActivity() {
         splashFirst = findViewById(R.id.splash_first)
         aboutPage = findViewById(R.id.about)
         frameAnimation = FrameAnimation(splashView)
-        frameAnimation!!.setRepeatMode(RepeatMode.ONCE)
-        frameAnimation!!.setScaleType(FrameAnimation.ScaleType.FIT_CENTER)
-        frameAnimation!!.freezeLastFrame(true)
-        frameAnimation!!.setSupportInBitmap(true)
+        frameAnimation.setRepeatMode(RepeatMode.ONCE)
+        frameAnimation.setScaleType(FrameAnimation.ScaleType.FIT_CENTER)
+        frameAnimation.freezeLastFrame(true)
 
         fun hideSplash() {
             splashView.animate()
                     .alpha(0f)
                     .withEndAction {
-                        frameAnimation!!.stopAnimation()
+                        frameAnimation.stopAnimation()
                         splashView.visibility = View.GONE
+                        splashFirst.visibility = View.GONE
                     }
                     .setDuration(500)
                     .start()
         }
 
-        val firstRun = sharedPreferences.getBoolean("firstRun", true)
-
-        Log.d(TAG, "onCreate: firstRun=$firstRun")
-
-        if (firstRun) {
-            splashFirst.visibility = View.VISIBLE
+        if (sharedPreferences.getBoolean("firstRun", true)) {
+            splashFirst.setImageResource(R.drawable.splash_first)
         }
 
         splashView.setOnClickListener {
-            if (firstRun) {
-                frameAnimation!!.playAnimationFromAssets("splash2")
+            if (sharedPreferences.getBoolean("firstRun", true)) {
+                frameAnimation.playAnimationFromAssets("splash2")
                 Timer("hide splash first", false)
                         .schedule(timerTask { runOnUiThread { splashFirst.visibility = View.GONE } }, 200)
                 sharedPreferences.edit {
@@ -112,8 +106,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        frameAnimation!!.setAnimationListener(object : FrameAnimation.FrameAnimationListener {
+        frameAnimation.setAnimationListener(object : FrameAnimation.FrameAnimationListener {
             override fun onAnimationEnd() {
+                Log.d(TAG, "onAnimationEnd: ")
                 hideSplash()
             }
 
@@ -140,6 +135,11 @@ class MainActivity : AppCompatActivity() {
                 imageUri.let { setBitmapFromUri(it) }
             }
         }
+    }
+
+    fun setDevice() {
+        val deviceName = getDeviceName()
+        Log.d(TAG, "setDevice: $deviceName")
     }
 
     fun toggleAbout(view: View?) {
@@ -184,13 +184,15 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         if (!sharedPreferences.getBoolean("firstRun", true)) {
-            frameAnimation!!.playAnimationFromAssets("splash")
+            frameAnimation.playAnimationFromAssets("splash")
+            Timer("hide splash first", false)
+                    .schedule(timerTask { runOnUiThread { splashFirst.visibility = View.GONE } }, 200)
         }
     }
 
     override fun onPause() {
         super.onPause()
-        frameAnimation!!.stopAnimation()
+        frameAnimation.stopAnimation()
     }
 
     fun selectImg(view: View?) {
@@ -247,7 +249,7 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == IMAGE_PICKER && data != null) {
-            setBitmapFromUri(data.data)
+            setBitmapFromUri(data.data!!)
         }
     }
 
@@ -262,23 +264,12 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         disposable.clear()
         _binding = null
-        frameAnimation!!.stopAnimation()
+        frameAnimation.stopAnimation()
     }
 
     companion object {
         private const val IMAGE_PICKER = 99
         private const val TAG = "hyl"
 
-        @JvmStatic
-        @BindingAdapter("bitmap")
-        fun setBitmap(imageView: MyImageView, src: Bitmap?) {
-            imageView.setImageBitmap(src)
-        }
-
-        @JvmStatic
-        @BindingAdapter("background_color")
-        fun setBgColor(view: View, color: LiveData<Int?>) {
-            view.setBackgroundColor(color.value!!)
-        }
     }
 }

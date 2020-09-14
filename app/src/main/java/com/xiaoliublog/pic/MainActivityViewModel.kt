@@ -18,10 +18,11 @@ import com.xiaoliublog.pic.model.PhoneColor
 import com.xiaoliublog.pic.utils.ImageCombiner
 import com.xiaoliublog.pic.utils.ImageWithPosition
 
+
 class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
     private val noahOne = NoahOne(getApplication())
     private val noahTwo = NoahTwo(getApplication())
-    private var aspect = 1.86
+    private var aspect = 1.86f
 
     val loading = MutableLiveData<Boolean>(true)
     private val _result = MutableLiveData<Bitmap>()
@@ -46,7 +47,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         val width = dm.widthPixels
         val height = dm.heightPixels
         Log.d(TAG, "device: width=${width},height=${height},${height / width.toFloat()}")
-        aspect = (height / width.toFloat()).toDouble()
+        aspect = height / width.toFloat()
         reRender()
     }
 
@@ -74,20 +75,22 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
         val images = ArrayList<ImageWithPosition>()
 
-        val oldBarHeight = 65
+        val oldBarHeight = 63
         val newBarHeight = 125
         if (content.value != null) {
 
+            val img = content.value!!
+
             if (!isTwo) currentPhone.top = frameHeight * currentPhone.topOfHeight
             val contentLeft = paddingX / 2f + currentPhone.left
-            val contentTop = paddingY / 2f + currentPhone.top
+            var contentTop = paddingY / 2f + currentPhone.top
             val contentWidth = frameWidth - currentPhone.left.toInt() * 2
             val contentHeight = frameHeight - currentPhone.top.toInt() * 2
 
             if (isTwo) {
                 Log.d(TAG, "build: Two")
-                val content = Bitmap.createScaledBitmap(content.value!!, contentWidth, contentHeight, true)
-                images.add(ImageWithPosition(contentLeft, contentTop, content))
+                val content = Bitmap.createScaledBitmap(content.value!!, contentWidth, contentHeight - 150, true)
+                images.add(ImageWithPosition(contentLeft, contentTop + 3, content))
             } else {
                 Log.d(TAG, "build: One")
                 val twoClip = Bitmap.createBitmap(Bitmap.createScaledBitmap(content.value!!, contentWidth, contentHeight, true), 0, oldBarHeight, contentWidth, contentHeight - oldBarHeight)
@@ -95,22 +98,43 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
                 images.add(ImageWithPosition(contentLeft, contentTop + newBarHeight, content))
             }
 
+            contentTop += 3f
+            val topColor = img.getPixel(4, 4)
+            val bottomColor = img.getPixel(4, img.height - 4)
+
+            val topBg = Bitmap.createBitmap(contentWidth, 10, Bitmap.Config.ARGB_8888)
+            topBg.eraseColor(topColor)
+            images.add(ImageWithPosition(contentLeft, contentTop - 10, topBg))
+
             if (!isTwo) {
-                val color = content.value!!.getPixel(content.value!!.width / 2, 1)
+                val statusBg = Bitmap.createBitmap(contentWidth, newBarHeight, Bitmap.Config.ARGB_8888)
+                statusBg.eraseColor(topColor)
                 val barBg = Bitmap.createBitmap(contentWidth, newBarHeight, Bitmap.Config.ARGB_8888)
-                if (computeContrastBetweenColors(color) < 3f) {
-                    val blackBar = BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bar_black, options)
-                    barBg.eraseColor(BackgroundColor.White)
-                    images.add(ImageWithPosition(contentLeft, contentTop, barBg))
-                    images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - newBarHeight, barBg))
-                    images.add(ImageWithPosition(contentLeft + 5, contentTop + 5, Bitmap.createScaledBitmap(blackBar, contentWidth - 5, contentHeight - 5, true)))
+                barBg.eraseColor(bottomColor)
+
+                val barFg = if (computeContrastBetweenColors(topColor) < 3f) {
+                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bar_black, options)
                 } else {
-                    val whiteBar = BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bar_white, options)
-                    barBg.eraseColor(BackgroundColor.Black)
-                    images.add(ImageWithPosition(contentLeft, contentTop, barBg))
-                    images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - newBarHeight, barBg))
-                    images.add(ImageWithPosition(contentLeft + 5, contentTop + 5, Bitmap.createScaledBitmap(whiteBar, contentWidth - 5, contentHeight - 5, true)))
+                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bar_white, options)
                 }
+
+                images.add(ImageWithPosition(contentLeft, contentTop, barBg))
+                images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - newBarHeight, barBg))
+                images.add(ImageWithPosition(contentLeft + 5, contentTop + 5, Bitmap.createScaledBitmap(barFg, contentWidth - 5, contentHeight - 5, true)))
+            }
+
+            if (isTwo) {
+
+                val barBg = Bitmap.createBitmap(contentWidth, 147, Bitmap.Config.ARGB_8888)
+                barBg.eraseColor(bottomColor)
+                images.add(ImageWithPosition(contentLeft, contentTop + contentHeight, barBg))
+
+                val bar = if (computeContrastBetweenColors(bottomColor) < 3f) {
+                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.menu_bar_white, options)
+                } else {
+                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.menu_bar_black, options)
+                }
+                images.add(ImageWithPosition(contentLeft, contentTop + contentHeight, Bitmap.createScaledBitmap(bar, contentWidth, 147, true)))
             }
         }
 
@@ -125,9 +149,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     fun reRender() {
         Log.d(TAG, "reRender: ")
         loading.postValue(true)
-        kotlin.run {
-            _result.postValue(build(false))
-        }
+        _result.postValue(build(false))
         loading.postValue(false)
     }
 
@@ -164,12 +186,18 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
     fun switchNoah1(view: View) {
         animation(view)
+        if (fgColor.value != PhoneColor.White || fgColor.value != PhoneColor.Black) {
+            fgColor.value = PhoneColor.White
+        }
         _phone.value = noahOne
         reRender()
     }
 
     fun switchNoah2(view: View) {
         animation(view)
+        if (fgColor.value != PhoneColor.White || fgColor.value != PhoneColor.Black) {
+            fgColor.value = PhoneColor.White
+        }
         _phone.value = noahTwo
         reRender()
     }
