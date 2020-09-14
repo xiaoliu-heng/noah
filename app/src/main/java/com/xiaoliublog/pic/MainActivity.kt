@@ -75,6 +75,8 @@ class MainActivity : AppCompatActivity() {
         frameAnimation.setRepeatMode(RepeatMode.ONCE)
         frameAnimation.setScaleType(FrameAnimation.ScaleType.FIT_CENTER)
         frameAnimation.freezeLastFrame(true)
+        frameAnimation.setScaleType(FrameAnimation.ScaleType.FIT_XY)
+        frameAnimation.setSupportInBitmap(true)
 
         fun hideSplash() {
             splashView.animate()
