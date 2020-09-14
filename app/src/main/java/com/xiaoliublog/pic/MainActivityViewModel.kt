@@ -27,17 +27,14 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     val loading = MutableLiveData<Boolean>(true)
     private val _result = MutableLiveData<Bitmap>()
     private val content = MutableLiveData<Bitmap?>()
-    private val _bgColor = MutableLiveData(BackgroundColor.White)
-    private val fgColor = MutableLiveData<PhoneColor>(PhoneColor.White)
+    val bg = MutableLiveData(BackgroundColor.White)
+    val isDark = MutableLiveData<Boolean>(false)
+    val fg = MutableLiveData<PhoneColor>(PhoneColor.White)
     private val options = BitmapFactory.Options()
 
     private val _phone = MutableLiveData<Phone>(noahTwo)
 
-    val bg = _bgColor
-    val fg = fgColor;
     val result: LiveData<Bitmap> = _result
-    val isDark: LiveData<Boolean>
-        get() = MutableLiveData<Boolean>(_bgColor.value!! == BackgroundColor.Black)
     val phone: LiveData<Phone> = _phone
 
     init {
@@ -52,13 +49,14 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun build(export: Boolean? = false): Bitmap {
+        loading.postValue(true)
         val currentPhone = _phone.value!!
         val isTwo: Boolean = currentPhone is NoahTwo
         val paddingX = if (isTwo) 0 else 957
-        val paddingY = if (isTwo) 0 else 1400
+        val paddingY = if (isTwo) 0 else 1440
         val imageComposeBuilder = ImageCombiner()
-        val bgColor = bg.value!!
-        var frameColor = fgColor.value!!
+        val bgColor = this.bg.value!!
+        var frameColor = this.fg.value!!
         if (isTwo) {
             if (isDark.value!!) {
                 if (frameColor == PhoneColor.White) frameColor = PhoneColor.WhiteOnBlack
@@ -109,7 +107,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
             if (!isTwo) {
                 val statusBg = Bitmap.createBitmap(contentWidth, newBarHeight, Bitmap.Config.ARGB_8888)
                 statusBg.eraseColor(topColor)
-                val barBg = Bitmap.createBitmap(contentWidth, newBarHeight, Bitmap.Config.ARGB_8888)
+                val barBg = Bitmap.createBitmap(contentWidth, newBarHeight + 10, Bitmap.Config.ARGB_8888)
                 barBg.eraseColor(bottomColor)
 
                 val barFg = if (computeContrastBetweenColors(topColor) < 3f) {
@@ -119,22 +117,21 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
                 }
 
                 images.add(ImageWithPosition(contentLeft, contentTop, barBg))
-                images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - newBarHeight, barBg))
+                images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - newBarHeight - 3f, barBg))
                 images.add(ImageWithPosition(contentLeft + 5, contentTop + 5, Bitmap.createScaledBitmap(barFg, contentWidth - 5, contentHeight - 5, true)))
             }
 
             if (isTwo) {
-
-                val barBg = Bitmap.createBitmap(contentWidth, 147, Bitmap.Config.ARGB_8888)
+                val barBg = Bitmap.createBitmap(contentWidth, 150, Bitmap.Config.ARGB_8888)
                 barBg.eraseColor(bottomColor)
-                images.add(ImageWithPosition(contentLeft, contentTop + contentHeight, barBg))
+                images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - 150, barBg))
 
                 val bar = if (computeContrastBetweenColors(bottomColor) < 3f) {
-                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.menu_bar_white, options)
-                } else {
                     BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.menu_bar_black, options)
+                } else {
+                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.menu_bar_white, options)
                 }
-                images.add(ImageWithPosition(contentLeft, contentTop + contentHeight, Bitmap.createScaledBitmap(bar, contentWidth, 147, true)))
+                images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - 150, Bitmap.createScaledBitmap(bar, contentWidth, 147, true)))
             }
         }
 
@@ -143,6 +140,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
             images.add(ImageWithPosition(paddingX / 2f, paddingY / 2f, Bitmap.createScaledBitmap(frame, frameWidth, frameHeight, true)))
         }
         imageComposeBuilder.images = images
+        loading.postValue(false)
+
         return imageComposeBuilder.combine()
     }
 
@@ -155,13 +154,18 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
     fun setBgColor(color: Int) {
         Log.d(TAG, "setBgColor: $color")
-        _bgColor.value = color
+        if (color == BackgroundColor.Black) {
+            isDark.postValue(true)
+        } else {
+            isDark.postValue(false)
+        }
+        this.bg.postValue(color)
         reRender()
     }
 
     fun setFgColor(color: PhoneColor) {
         Log.d(TAG, "setFgColor: $color")
-        fgColor.value = color
+        this.fg.postValue(color)
         reRender()
     }
 
@@ -186,8 +190,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
     fun switchNoah1(view: View) {
         animation(view)
-        if (fgColor.value != PhoneColor.White || fgColor.value != PhoneColor.Black) {
-            fgColor.value = PhoneColor.White
+        if (this.fg.value != PhoneColor.White || this.fg.value != PhoneColor.Black) {
+            this.fg.value = PhoneColor.White
         }
         _phone.value = noahOne
         reRender()
@@ -195,8 +199,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
     fun switchNoah2(view: View) {
         animation(view)
-        if (fgColor.value != PhoneColor.White || fgColor.value != PhoneColor.Black) {
-            fgColor.value = PhoneColor.White
+        if (this.fg.value != PhoneColor.White || this.fg.value != PhoneColor.Black) {
+            this.fg.value = PhoneColor.White
         }
         _phone.value = noahTwo
         reRender()

@@ -36,7 +36,7 @@
         <com.google.android.flexbox.FlexboxLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@{viewmodel.isDark?@drawable/border_dark:@drawable/border_light}"
+            bg_img="@{viewmodel.isDark?@drawable/border_dark:@drawable/border_light}"
             android:paddingVertical="10dp"
             app:justifyContent="space_between">
 
@@ -269,6 +269,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:fontFamily="@font/oppo_sans_bold"
+                android:textColor="@{viewmodel.isDark?@color/white:@color/black}"
                 android:text="更多详情请访问:WWW.NOAHCONCEPT.COM"
                 android:textAlignment="center" />
 
@@ -277,6 +278,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/oppo_sans_bold"
+                android:textColor="@{viewmodel.isDark?@color/white:@color/black}"
                 android:text="本软件不保证在未经测试的设备上的兼容性"
                 android:textAlignment="center" />
 
@@ -291,6 +293,7 @@
                 android:layout_marginStart="40dp"
                 android:layout_marginBottom="10dp"
                 android:fontFamily="@font/oppo_sans_bold"
+                android:textColor="@{viewmodel.isDark?@color/white:@color/black}"
                 android:text="工业设计: 周文正/陈冉"
                 android:textAlignment="textStart" />
 
@@ -300,6 +303,7 @@
                 android:layout_marginStart="40dp"
                 android:layout_marginBottom="10dp"
                 android:fontFamily="@font/oppo_sans_bold"
+                android:textColor="@{viewmodel.isDark?@color/white:@color/black}"
                 android:text="宣传视频: 陈冉"
                 android:textAlignment="textStart" />
 
@@ -309,6 +313,7 @@
                 android:layout_marginStart="40dp"
                 android:layout_marginBottom="60dp"
                 android:fontFamily="@font/oppo_sans_bold"
+                android:textColor="@{viewmodel.isDark?@color/white:@color/black}"
                 android:text="字体设计: 徐飞航"
                 android:textAlignment="textStart" />
 
@@ -318,6 +323,7 @@
                 android:layout_marginStart="40dp"
                 android:layout_marginBottom="40dp"
                 android:fontFamily="@font/oppo_sans_bold"
+                android:textColor="@{viewmodel.isDark?@color/white:@color/black}"
                 android:text="手机端软件: 衡俊青/衡玉良"
                 android:textAlignment="textStart" />
 

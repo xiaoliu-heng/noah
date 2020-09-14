@@ -204,7 +204,6 @@ class MainActivity : AppCompatActivity() {
 
     fun shareImg(view: View?) {
         try {
-            model.loading.value = true
             val cachePath = File(cacheDir, "images")
             cachePath.mkdirs() // don't forget to make the directory
             val stream = FileOutputStream("$cachePath/image.png") // overwrites this image every time
@@ -222,7 +221,6 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent.createChooser(shareIntent, "选择要分享的APP"))
             }
             stream.close()
-            model.loading.value = false
         } catch (e: IOException) {
             e.printStackTrace()
         }

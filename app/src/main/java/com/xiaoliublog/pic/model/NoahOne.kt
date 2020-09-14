@@ -15,7 +15,7 @@ class NoahOne(override var context: Context) : Phone(context) {
         left = 72f
         top = 70f
         width = 2157f
-        height = 3880f
+        height = 3890f
 
         topOfHeight = 0.0332541567695962F
     }
