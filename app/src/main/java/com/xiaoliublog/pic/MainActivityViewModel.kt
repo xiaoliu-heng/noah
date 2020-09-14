@@ -17,6 +17,7 @@ import com.xiaoliublog.pic.model.Phone
 import com.xiaoliublog.pic.model.PhoneColor
 import com.xiaoliublog.pic.utils.ImageCombiner
 import com.xiaoliublog.pic.utils.ImageWithPosition
+import com.xiaoliublog.pic.utils.animation
 
 
 class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
@@ -172,20 +173,6 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     fun setTwo(bitmap: Bitmap?) {
         content.value = bitmap
         reRender()
-    }
-
-    private fun animation(view: View) {
-        view.animate().apply {
-            duration = 100
-            scaleX(0.8f)
-            scaleY(0.8f)
-            withEndAction {
-                scaleX(1f)
-                scaleY(1f)
-                start()
-            }
-            start()
-        }
     }
 
     fun switchNoah1(view: View) {

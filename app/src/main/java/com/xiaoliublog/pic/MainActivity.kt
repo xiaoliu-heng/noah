@@ -21,6 +21,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.xiaoliublog.pic.databinding.ActivityMainBinding
+import com.xiaoliublog.pic.utils.animation
 import com.xiaoliublog.pic.utils.getDeviceName
 import com.yuyashuai.frameanimation.FrameAnimation
 import com.yuyashuai.frameanimation.FrameAnimation.RepeatMode
@@ -155,8 +156,9 @@ class MainActivity : AppCompatActivity() {
                 .start()
     }
 
-    @AfterPermissionGranted(Storage_Code)
+    @AfterPermissionGranted(100)
     fun saveImg(view: View?) {
+        animation(view!!)
         val perms = arrayOf<String>(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
         if (EasyPermissions.hasPermissions(this, *perms)) {
             model.loading.value = true
@@ -179,7 +181,7 @@ class MainActivity : AppCompatActivity() {
                     .doFinally { model.loading.value = false }
                     .subscribe()
         } else {
-            EasyPermissions.requestPermissions(this, "需要储存权限", Storage_Code, *perms)
+            EasyPermissions.requestPermissions(this, "需要储存权限", 100, *perms)
         }
     }
 
@@ -198,6 +200,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun selectImg(view: View?) {
+        animation(view!!)
         val intent = Intent()
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT
@@ -205,6 +208,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun shareImg(view: View?) {
+        animation(view!!)
         try {
             model.loading.value = true
             val cachePath = File(cacheDir, "images")
