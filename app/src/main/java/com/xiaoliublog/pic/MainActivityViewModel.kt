@@ -77,12 +77,11 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         val images = ArrayList<ImageWithPosition>()
 
         val oldBarHeight = 63
-        val newBarHeight = 113
+        val newBarHeight = 147
         if (content.value != null) {
 
             val img = content.value!!
 
-            if (!isTwo) currentPhone.top = frameHeight * currentPhone.topOfHeight
             val contentLeft = paddingX / 2f + currentPhone.left
             var contentTop = paddingY / 2f + currentPhone.top
             val contentWidth = frameWidth - currentPhone.left.toInt() * 2
@@ -99,13 +98,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
                 images.add(ImageWithPosition(contentLeft, contentTop + newBarHeight, content))
             }
 
-            contentTop += 3f
             val topColor = img.getPixel(4, 4)
             val bottomColor = img.getPixel(4, img.height - 4)
-
-            val topBg = Bitmap.createBitmap(contentWidth, 10, Bitmap.Config.ARGB_8888)
-            topBg.eraseColor(topColor)
-            images.add(ImageWithPosition(contentLeft, contentTop - 10, topBg))
 
             if (!isTwo) {
                 val statusBg = Bitmap.createBitmap(contentWidth, newBarHeight, Bitmap.Config.ARGB_8888)
@@ -113,26 +107,38 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
                 val barBg = Bitmap.createBitmap(contentWidth, newBarHeight + 10, Bitmap.Config.ARGB_8888)
                 barBg.eraseColor(bottomColor)
 
-                val barFg = if (computeContrastBetweenColors(topColor) < 3f) {
-                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bar_black, options)
+                val statusBar = if (computeContrastBetweenColors(topColor) < 3f) {
+                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.status_bar_dark, options)
                 } else {
-                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bar_white, options)
+                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.status_bar_white, options)
                 }
 
-                images.add(ImageWithPosition(contentLeft, contentTop, barBg))
+                val bottomBar = if (computeContrastBetweenColors(topColor) < 3f) {
+                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bottom_bar_white, options)
+                } else {
+                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bottom_bar_white, options)
+                }
+
+                images.add(ImageWithPosition(contentLeft, contentTop, statusBg))
                 images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - newBarHeight - 3f, barBg))
-                images.add(ImageWithPosition(contentLeft, contentTop, Bitmap.createScaledBitmap(barFg, contentWidth, contentHeight, true)))
+                images.add(ImageWithPosition(contentLeft - 12, contentTop - 10, Bitmap.createScaledBitmap(statusBar, contentWidth, newBarHeight, true)))
+                images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - newBarHeight - 3f, Bitmap.createScaledBitmap(bottomBar, contentWidth, 147, true)))
             }
 
             if (isTwo) {
+                val topBg = Bitmap.createBitmap(contentWidth, 10, Bitmap.Config.ARGB_8888)
+                topBg.eraseColor(topColor)
+                images.add(ImageWithPosition(contentLeft, contentTop - 10, topBg))
+                contentTop += 3f
+
                 val barBg = Bitmap.createBitmap(contentWidth, 150, Bitmap.Config.ARGB_8888)
                 barBg.eraseColor(bottomColor)
                 images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - 150, barBg))
 
                 val bar = if (computeContrastBetweenColors(bottomColor) < 3f) {
-                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bottom_bar_black, options)
-                } else {
                     BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bottom_bar_white, options)
+                } else {
+                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bottom_bar_black, options)
                 }
                 images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - 150, Bitmap.createScaledBitmap(bar, contentWidth, 147, true)))
             }

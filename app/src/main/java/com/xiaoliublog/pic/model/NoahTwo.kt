@@ -30,9 +30,21 @@ class NoahTwo(override var context: Context) : Phone(context) {
             }
         }
 
+    override val top: Float
+        get() {
+            return when (getDeviceName()) {
+                "OS105",
+                "OE106" -> 735f
+                "DE106" -> 700f
+                else -> 700f
+            }
+        }
+
+    override val left: Float
+        get() = 540f
+
+
     init {
-        left = 540f
-        top = 700f
         width = 2157f
         height = 3890f
     }

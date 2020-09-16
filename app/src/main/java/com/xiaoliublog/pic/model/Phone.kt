@@ -16,8 +16,8 @@ enum class PhoneColor {
 open class Phone(open val context: Context) {
     open val colors: MutableMap<PhoneColor, Int?> = mutableMapOf()
     private var cache: MutableMap<PhoneColor, Bitmap?> = mutableMapOf()
-    var top: Float = 0f
-    var left: Float = 0f
+    open val top: Float = 0f
+    open val left: Float = 0f
     var height: Float = 0f
     var width: Float = 0f
     var topOfHeight: Float = 0f

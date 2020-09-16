@@ -31,13 +31,15 @@ class NoahOne(override var context: Context) : Phone(context) {
             }
         }
 
+    override val top: Float
+        get() = 70f
+
+    override val left: Float
+        get() = 80f
+
     init {
-        left = 80f
-        top = 70f
         width = 2157f
         height = 3890f
-
-        topOfHeight = 0.0332541567695962F
     }
 
 }
