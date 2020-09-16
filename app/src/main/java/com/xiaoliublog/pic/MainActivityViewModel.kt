@@ -18,6 +18,7 @@ import com.xiaoliublog.pic.model.PhoneColor
 import com.xiaoliublog.pic.utils.ImageCombiner
 import com.xiaoliublog.pic.utils.ImageWithPosition
 import com.xiaoliublog.pic.utils.animation
+import com.xiaoliublog.pic.utils.getDeviceName
 
 
 class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
@@ -26,6 +27,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     private var aspect = 1.86f
 
     val loading = MutableLiveData<Boolean>(true)
+    val isPro3 = MutableLiveData(getDeviceName() == "OC105")
     private val _result = MutableLiveData<Bitmap>()
     private val content = MutableLiveData<Bitmap?>()
     val bg = MutableLiveData(BackgroundColor.White)
@@ -75,7 +77,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         val images = ArrayList<ImageWithPosition>()
 
         val oldBarHeight = 63
-        val newBarHeight = 125
+        val newBarHeight = 113
         if (content.value != null) {
 
             val img = content.value!!
@@ -119,7 +121,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
                 images.add(ImageWithPosition(contentLeft, contentTop, barBg))
                 images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - newBarHeight - 3f, barBg))
-                images.add(ImageWithPosition(contentLeft + 5, contentTop + 5, Bitmap.createScaledBitmap(barFg, contentWidth - 5, contentHeight - 5, true)))
+                images.add(ImageWithPosition(contentLeft, contentTop, Bitmap.createScaledBitmap(barFg, contentWidth, contentHeight, true)))
             }
 
             if (isTwo) {
@@ -128,9 +130,9 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
                 images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - 150, barBg))
 
                 val bar = if (computeContrastBetweenColors(bottomColor) < 3f) {
-                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.menu_bar_black, options)
+                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bottom_bar_black, options)
                 } else {
-                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.menu_bar_white, options)
+                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bottom_bar_white, options)
                 }
                 images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - 150, Bitmap.createScaledBitmap(bar, contentWidth, 147, true)))
             }

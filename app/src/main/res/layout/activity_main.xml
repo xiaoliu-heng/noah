@@ -52,6 +52,7 @@
                     android:paddingStart="10dp"
                     android:scaleType="fitCenter"
                     android:src="@{viewmodel.isDark?@drawable/noah1_icon_dark:@drawable/noah1_icon_light}"
+                    android:visibility="@{viewmodel.isPro3?View.GONE:View.VISIBLE}"
                     tools:ignore="RtlSymmetry" />
 
                 <ImageButton
@@ -60,6 +61,7 @@
                     android:layout_marginHorizontal="10dp"
                     android:background="@color/transparent"
                     android:scaleType="fitCenter"
+                    android:visibility="@{viewmodel.isPro3?View.GONE:View.VISIBLE}"
                     android:src="@{viewmodel.isDark?@drawable/icon_split_dark:@drawable/icon_split_light}" />
 
                 <ImageButton
@@ -151,6 +153,16 @@
                         android:button="@null"
                         android:onClick="@{()->viewmodel.setBgColor(BackgroundColor.White)}"
                         app:selectedColor="#E6E6E6"
+                        app:shape="circle" />
+
+                    <com.xiaoliublog.pic.ui.MyRadioButton
+                        android:id="@+id/radio_transparent"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:button="@null"
+                        android:visibility="@{viewmodel.phone instanceof NoahTwo ? View.GONE : View.VISIBLE}"
+                        android:onClick="@{()->viewmodel.setBgColor(BackgroundColor.Transparent)}"
+                        app:selectedColor="@color/transparent"
                         app:shape="circle" />
 
                 </com.google.android.flexbox.FlexboxLayout>

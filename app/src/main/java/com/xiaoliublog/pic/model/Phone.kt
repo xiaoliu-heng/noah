@@ -14,8 +14,8 @@ enum class PhoneColor {
 }
 
 open class Phone(open val context: Context) {
-    lateinit var colors: MutableMap<PhoneColor, Int?>
-    var phones: MutableMap<PhoneColor, Bitmap?> = mutableMapOf()
+    open val colors: MutableMap<PhoneColor, Int?> = mutableMapOf()
+    private var cache: MutableMap<PhoneColor, Bitmap?> = mutableMapOf()
     var top: Float = 0f
     var left: Float = 0f
     var height: Float = 0f
@@ -25,11 +25,11 @@ open class Phone(open val context: Context) {
     fun load(color: PhoneColor): Bitmap? {
         val phone = colors.get(color) ?: return null
         val bitmap: Bitmap?
-        if (phones.get(color) == null) {
+        if (cache[color] == null) {
             bitmap = BitmapFactory.decodeResource(context.resources, phone)
-            phones[color] = bitmap
+            cache[color] = bitmap
         } else {
-            bitmap = phones.get(color)
+            bitmap = cache[color]
         }
         return bitmap
     }
