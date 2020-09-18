@@ -32,10 +32,30 @@ class NoahOne(override var context: Context) : Phone(context) {
         }
 
     override val top: Float
-        get() = 70f
+        get() = 65f
 
     override val left: Float
-        get() = 80f
+        get() = 78f
+
+    override val paddingTop: Float
+        get() {
+            return when (getDeviceName()) {
+                "OS105",
+                "OE106" -> 706f
+                "DE106" -> 676f
+                else -> 700f
+            }
+        }
+
+    override val paddingLeft: Float
+        get() {
+            return when (getDeviceName()) {
+                "OS105",
+                "OE106" -> 463f
+                "DE106" -> 463f
+                else -> 463f
+            }
+        }
 
     init {
         width = 2157f

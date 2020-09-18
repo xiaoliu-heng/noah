@@ -20,8 +20,8 @@ open class Phone(open val context: Context) {
     open val left: Float = 0f
     var height: Float = 0f
     var width: Float = 0f
-    var topOfHeight: Float = 0f
-    var leftOfWidth: Float = 0f
+    open val paddingTop: Float = 0f
+    open val paddingLeft: Float = 0f
     fun load(color: PhoneColor): Bitmap? {
         val phone = colors.get(color) ?: return null
         val bitmap: Bitmap?

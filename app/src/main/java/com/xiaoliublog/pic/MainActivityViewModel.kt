@@ -55,8 +55,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         loading.postValue(true)
         val currentPhone = _phone.value!!
         val isTwo: Boolean = currentPhone is NoahTwo
-        val paddingX = if (isTwo) 0 else 957
-        val paddingY = if (isTwo) 0 else 1440
+        val paddingX = (currentPhone.paddingLeft * 2f).toInt()
+        val paddingY = (currentPhone.paddingTop * 2f).toInt()
         val imageComposeBuilder = ImageCombiner()
         val bgColor = this.bg.value!!
         var frameColor = this.fg.value!!
@@ -76,41 +76,34 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
         val images = ArrayList<ImageWithPosition>()
 
-        val oldBarHeight = 63
-        val newBarHeight = 147
+        val oldBarHeight = 65
+        val newBarHeight = 124
         if (content.value != null) {
 
             val img = content.value!!
 
             val contentLeft = paddingX / 2f + currentPhone.left
-            var contentTop = paddingY / 2f + currentPhone.top
+            val contentTop = paddingY / 2f + currentPhone.top
             val contentWidth = frameWidth - currentPhone.left.toInt() * 2
             val contentHeight = frameHeight - currentPhone.top.toInt() * 2
 
-            if (isTwo) {
-                Log.d(TAG, "build: Two")
-                val content = Bitmap.createScaledBitmap(content.value!!, contentWidth, contentHeight - 150, true)
-                images.add(ImageWithPosition(contentLeft, contentTop + 3, content))
-            } else {
-                Log.d(TAG, "build: One")
-                val twoClip = Bitmap.createBitmap(Bitmap.createScaledBitmap(content.value!!, contentWidth, contentHeight, true), 0, oldBarHeight, contentWidth, contentHeight - oldBarHeight)
-                val content = Bitmap.createScaledBitmap(twoClip, contentWidth, contentHeight - newBarHeight * 2, true)
-                images.add(ImageWithPosition(contentLeft, contentTop + newBarHeight, content))
-            }
+            Log.d(TAG, "build:  contentLeft=$contentLeft,contentTop=$contentTop,contentWidth=$contentWidth,contentHeight=$contentHeight")
 
             val topColor = img.getPixel(4, 4)
             val bottomColor = img.getPixel(4, img.height - 4)
 
             if (!isTwo) {
-                val statusBg = Bitmap.createBitmap(contentWidth, newBarHeight, Bitmap.Config.ARGB_8888)
+                Log.d(TAG, "build: One")
+
+                val statusBg = Bitmap.createBitmap(contentWidth + 6, newBarHeight + 10, Bitmap.Config.ARGB_8888)
                 statusBg.eraseColor(topColor)
                 val barBg = Bitmap.createBitmap(contentWidth, newBarHeight + 10, Bitmap.Config.ARGB_8888)
                 barBg.eraseColor(bottomColor)
 
                 val statusBar = if (computeContrastBetweenColors(topColor) < 3f) {
-                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.status_bar_dark, options)
+                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.noah1_status_black, options)
                 } else {
-                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.status_bar_white, options)
+                    BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.noah1_status_white, options)
                 }
 
                 val bottomBar = if (computeContrastBetweenColors(topColor) < 3f) {
@@ -119,28 +112,36 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
                     BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bottom_bar_white, options)
                 }
 
-                images.add(ImageWithPosition(contentLeft, contentTop, statusBg))
+                images.add(ImageWithPosition(contentLeft - 3, contentTop - 5, statusBg))
+                images.add(ImageWithPosition(contentLeft, contentTop, Bitmap.createScaledBitmap(statusBar, contentWidth, newBarHeight, true)))
                 images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - newBarHeight - 3f, barBg))
-                images.add(ImageWithPosition(contentLeft - 12, contentTop - 10, Bitmap.createScaledBitmap(statusBar, contentWidth, newBarHeight, true)))
                 images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - newBarHeight - 3f, Bitmap.createScaledBitmap(bottomBar, contentWidth, 147, true)))
+
+                val twoClip = Bitmap.createScaledBitmap(Bitmap.createBitmap(content.value!!, 0, oldBarHeight, contentWidth, content.value!!.height - oldBarHeight), contentWidth, contentHeight - newBarHeight - 147, true)
+                val content = Bitmap.createScaledBitmap(twoClip, contentWidth, contentHeight - newBarHeight * 2, true)
+                images.add(ImageWithPosition(contentLeft, contentTop + newBarHeight, content))
             }
 
             if (isTwo) {
+                Log.d(TAG, "build: Two")
+
                 val topBg = Bitmap.createBitmap(contentWidth, 10, Bitmap.Config.ARGB_8888)
                 topBg.eraseColor(topColor)
-                images.add(ImageWithPosition(contentLeft, contentTop - 10, topBg))
-                contentTop += 3f
+                images.add(ImageWithPosition(contentLeft, contentTop - 5, topBg))
 
                 val barBg = Bitmap.createBitmap(contentWidth, 150, Bitmap.Config.ARGB_8888)
                 barBg.eraseColor(bottomColor)
-                images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - 150, barBg))
+                images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - 147, barBg))
 
                 val bar = if (computeContrastBetweenColors(bottomColor) < 3f) {
                     BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bottom_bar_white, options)
                 } else {
                     BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bottom_bar_black, options)
                 }
-                images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - 150, Bitmap.createScaledBitmap(bar, contentWidth, 147, true)))
+                images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - 147, Bitmap.createScaledBitmap(bar, contentWidth, 147, true)))
+
+                val content = Bitmap.createScaledBitmap(content.value!!, contentWidth, contentHeight - 150, true)
+                images.add(ImageWithPosition(contentLeft, contentTop + 3, content))
             }
         }
 

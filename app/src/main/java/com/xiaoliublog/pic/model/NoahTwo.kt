@@ -22,10 +22,10 @@ class NoahTwo(override var context: Context) : Phone(context) {
                         PhoneColor.WhiteOnBlack to R.drawable.noah2_r1_white_black
                 )
                 else -> mutableMapOf(
-                        PhoneColor.Black to R.drawable.noah2_pro2_black_black,
-                        PhoneColor.White to R.drawable.noah2_pro2_white_white,
-                        PhoneColor.BlackOnWhite to R.drawable.noah2_pro2_black_white,
-                        PhoneColor.WhiteOnBlack to R.drawable.noah2_pro2_white_black
+                        PhoneColor.Black to R.drawable.noah2_pro3_black_black,
+                        PhoneColor.White to R.drawable.noah2_pro3_white_white,
+                        PhoneColor.BlackOnWhite to R.drawable.noah2_pro3_black_white,
+                        PhoneColor.WhiteOnBlack to R.drawable.noah2_pro3_white_black
                 )
             }
         }
@@ -34,9 +34,9 @@ class NoahTwo(override var context: Context) : Phone(context) {
         get() {
             return when (getDeviceName()) {
                 "OS105",
-                "OE106" -> 735f
-                "DE106" -> 700f
-                else -> 700f
+                "OE106" -> 790f
+                "DE106" -> 750f
+                else -> 780f
             }
         }
 
