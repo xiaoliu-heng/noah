@@ -3,6 +3,7 @@ package com.xiaoliublog.pic.model
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import com.xiaoliublog.pic.utils.getDeviceName
 
 enum class PhoneColor {
     Green,
@@ -22,6 +23,17 @@ open class Phone(open val context: Context) {
     var width: Float = 0f
     open val paddingTop: Float = 0f
     open val paddingLeft: Float = 0f
+
+    val statusBarHeight: Float
+        get() {
+            return when (getDeviceName()) {
+                "OS105",
+                "OE106" -> 58f
+                "DE106" -> 81f
+                else -> 58f
+            }
+        }
+
     fun load(color: PhoneColor): Bitmap? {
         val phone = colors.get(color) ?: return null
         val bitmap: Bitmap?

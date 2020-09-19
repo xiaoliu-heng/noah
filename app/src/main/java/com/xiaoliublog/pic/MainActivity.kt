@@ -1,14 +1,17 @@
 package com.xiaoliublog.pic
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.os.Parcelable
+import android.provider.OpenableColumns
 import android.util.Log
 import android.view.TextureView
 import android.view.View
@@ -74,10 +77,9 @@ class MainActivity : AppCompatActivity() {
         aboutPage = findViewById(R.id.about)
         frameAnimation = FrameAnimation(splashView)
         frameAnimation.setRepeatMode(RepeatMode.ONCE)
-        frameAnimation.setScaleType(FrameAnimation.ScaleType.FIT_CENTER)
         frameAnimation.freezeLastFrame(true)
         frameAnimation.setScaleType(FrameAnimation.ScaleType.FIT_XY)
-        frameAnimation.setSupportInBitmap(true)
+        frameAnimation.setFrameInterval(33)
 
         fun hideSplash() {
             splashView.animate()
@@ -140,6 +142,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (!sharedPreferences.getBoolean("firstRun", true)) {
+            frameAnimation.playAnimationFromAssets("splash")
+            Timer("hide splash first", false)
+                    .schedule(timerTask { runOnUiThread { splashFirst.visibility = View.GONE } }, 200)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        frameAnimation.stopAnimation()
+    }
+
     fun setDevice() {
         val deviceName = getDeviceName()
         Log.d(TAG, "setDevice: $deviceName")
@@ -183,20 +199,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             EasyPermissions.requestPermissions(this, "需要储存权限", 100, *perms)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (!sharedPreferences.getBoolean("firstRun", true)) {
-            frameAnimation.playAnimationFromAssets("splash")
-            Timer("hide splash first", false)
-                    .schedule(timerTask { runOnUiThread { splashFirst.visibility = View.GONE } }, 200)
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        frameAnimation.stopAnimation()
     }
 
     fun selectImg(view: View?) {
@@ -253,10 +255,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == IMAGE_PICKER && data != null) {
-            setBitmapFromUri(data.data!!)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
+        super.onActivityResult(requestCode, resultCode, resultData)
+        if (requestCode == IMAGE_PICKER && resultCode == Activity.RESULT_OK) {
+            resultData?.data?.also { uri ->
+                Log.i(TAG, "Uri: $uri")
+                val fileName = getFileName(uri)
+                if (fileName.startsWith("Screenshot")) {
+                    setBitmapFromUri(uri)
+                } else {
+                    Toast.makeText(this, "(oﾟvﾟ)ノ 只支持屏幕截图哦", Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 
@@ -272,6 +282,29 @@ class MainActivity : AppCompatActivity() {
         disposable.clear()
         _binding = null
         frameAnimation.stopAnimation()
+    }
+
+    private fun getFileName(uri: Uri): String {
+
+        // The query, since it only applies to a single document, will only return
+        // one row. There's no need to filter, sort, or select fields, since we want
+        // all fields for one document.
+        val cursor: Cursor? = contentResolver.query(uri, null, null, null, null, null)
+
+        cursor?.use {
+            // moveToFirst() returns false if the cursor has 0 rows.  Very handy for
+            // "if there's anything to look at, look at it" conditionals.
+            if (it.moveToFirst()) {
+
+                // Note it's called "Display Name".  This is
+                // provider-specific, and might not necessarily be the file name.
+                val displayName: String =
+                        it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                Log.i(TAG, "Display Name: $displayName")
+                return displayName
+            }
+        }
+        return ""
     }
 
     companion object {

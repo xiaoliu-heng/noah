@@ -70,14 +70,17 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         val frameWidth = (currentPhone.width - paddingX).toInt()
         val frameHeight = (currentPhone.height - paddingY).toInt()
 
+        Log.d(TAG, "build: frameWidth=$frameWidth, frameHeight=$frameHeight")
+
         imageComposeBuilder.bgColor = bgColor
         imageComposeBuilder.width = frameWidth + paddingX
         imageComposeBuilder.height = frameHeight + paddingY
 
         val images = ArrayList<ImageWithPosition>()
 
-        val oldBarHeight = 65
-        val newBarHeight = 124
+        val oldStatusBarHeight = currentPhone.statusBarHeight.toInt()
+        val statusBarHeight = 124
+        val menuBarHeight = 147
         if (content.value != null) {
 
             val img = content.value!!
@@ -95,31 +98,31 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
             if (!isTwo) {
                 Log.d(TAG, "build: One")
 
-                val statusBg = Bitmap.createBitmap(contentWidth + 6, newBarHeight + 10, Bitmap.Config.ARGB_8888)
-                statusBg.eraseColor(topColor)
-                val barBg = Bitmap.createBitmap(contentWidth, newBarHeight + 10, Bitmap.Config.ARGB_8888)
-                barBg.eraseColor(bottomColor)
+                val statusBarBg = Bitmap.createBitmap(contentWidth + 6, statusBarHeight + 10, Bitmap.Config.ARGB_8888)
+                statusBarBg.eraseColor(topColor)
+                images.add(ImageWithPosition(contentLeft - 3, contentTop - 5, statusBarBg))
 
                 val statusBar = if (computeContrastBetweenColors(topColor) < 3f) {
                     BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.noah1_status_black, options)
                 } else {
                     BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.noah1_status_white, options)
                 }
+                images.add(ImageWithPosition(contentLeft + 3f, contentTop + 5f, Bitmap.createScaledBitmap(statusBar, contentWidth, statusBarHeight, true)))
+
+                val menuBarBg = Bitmap.createBitmap(contentWidth, menuBarHeight, Bitmap.Config.ARGB_8888)
+                menuBarBg.eraseColor(bottomColor)
+                images.add(ImageWithPosition(contentLeft, contentTop + statusBarHeight + (contentHeight - statusBarHeight - menuBarHeight), menuBarBg))
 
                 val bottomBar = if (computeContrastBetweenColors(topColor) < 3f) {
                     BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bottom_bar_white, options)
                 } else {
                     BitmapFactory.decodeResource(getApplication<Application>().resources, R.drawable.bottom_bar_white, options)
                 }
+                images.add(ImageWithPosition(contentLeft, contentTop + statusBarHeight + (contentHeight - statusBarHeight - menuBarHeight), Bitmap.createScaledBitmap(bottomBar, contentWidth, menuBarHeight, true)))
 
-                images.add(ImageWithPosition(contentLeft - 3, contentTop - 5, statusBg))
-                images.add(ImageWithPosition(contentLeft, contentTop, Bitmap.createScaledBitmap(statusBar, contentWidth, newBarHeight, true)))
-                images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - newBarHeight - 3f, barBg))
-                images.add(ImageWithPosition(contentLeft, contentTop + contentHeight - newBarHeight - 3f, Bitmap.createScaledBitmap(bottomBar, contentWidth, 147, true)))
-
-                val twoClip = Bitmap.createScaledBitmap(Bitmap.createBitmap(content.value!!, 0, oldBarHeight, contentWidth, content.value!!.height - oldBarHeight), contentWidth, contentHeight - newBarHeight - 147, true)
-                val content = Bitmap.createScaledBitmap(twoClip, contentWidth, contentHeight - newBarHeight * 2, true)
-                images.add(ImageWithPosition(contentLeft, contentTop + newBarHeight, content))
+                val twoClip = Bitmap.createScaledBitmap(Bitmap.createBitmap(img, 0, oldStatusBarHeight, contentWidth, img.height - oldStatusBarHeight), contentWidth, contentHeight - statusBarHeight - menuBarHeight, true)
+                val content = Bitmap.createScaledBitmap(twoClip, contentWidth, contentHeight - statusBarHeight * 2, true)
+                images.add(ImageWithPosition(contentLeft, contentTop + statusBarHeight, content))
             }
 
             if (isTwo) {
