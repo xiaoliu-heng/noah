@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:custom="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -143,8 +144,8 @@
                         android:layout_height="30dp"
                         android:button="@null"
                         android:onClick="@{()->viewmodel.setBgColor(BackgroundColor.Black)}"
-                        app:selectedColor="#515152"
-                        app:shape="circle" />
+                        custom:selectedColor="@drawable/radio_bg_black"
+                        custom:shape="circle" />
 
                     <com.xiaoliublog.pic.ui.MyRadioButton
                         android:id="@+id/radio_white"
@@ -152,8 +153,8 @@
                         android:layout_height="30dp"
                         android:button="@null"
                         android:onClick="@{()->viewmodel.setBgColor(BackgroundColor.White)}"
-                        app:selectedColor="#E6E6E6"
-                        app:shape="circle" />
+                        custom:selectedColor="@drawable/radio_bg_white"
+                        custom:shape="circle" />
 
                     <com.xiaoliublog.pic.ui.MyRadioButton
                         android:id="@+id/radio_transparent"
@@ -162,8 +163,8 @@
                         android:button="@null"
                         android:visibility="@{viewmodel.phone instanceof NoahTwo ? View.GONE : View.VISIBLE}"
                         android:onClick="@{()->viewmodel.setBgColor(BackgroundColor.Transparent)}"
-                        app:selectedColor="@color/transparent"
-                        app:shape="circle" />
+                        custom:selectedColor="@drawable/radio_bg_transparent"
+                        custom:shape="circle" />
 
                 </com.google.android.flexbox.FlexboxLayout>
             </RadioGroup>
@@ -221,35 +222,39 @@
                 android:layout_width="20dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="10dp"
+                android:button="@null"
                 android:checked="@{viewmodel.fg == PhoneColor.White}"
                 android:onClick="@{() -> viewmodel.setFgColor(PhoneColor.White)}"
-                app:selectedColor="#FEFFFE" />
+                custom:selectedColor="@drawable/radio_white" />
 
             <com.xiaoliublog.pic.ui.MyRadioButton
                 android:layout_width="20dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="10dp"
+                android:button="@null"
                 android:checked="@{viewmodel.fg == PhoneColor.Black}"
                 android:onClick="@{() -> viewmodel.setFgColor(PhoneColor.Black)}"
-                app:selectedColor="#2C2C2C" />
+                custom:selectedColor="@drawable/radio_black" />
 
             <com.xiaoliublog.pic.ui.MyRadioButton
                 android:layout_width="20dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="10dp"
+                android:button="@null"
                 android:checked="@{viewmodel.fg == PhoneColor.Pink}"
                 android:onClick="@{() -> viewmodel.setFgColor(PhoneColor.Pink)}"
                 android:visibility="@{viewmodel.phone instanceof NoahTwo ? View.GONE : View.VISIBLE}"
-                app:selectedColor="#FEA6A3" />
+                custom:selectedColor="@drawable/radio_red" />
 
             <com.xiaoliublog.pic.ui.MyRadioButton
                 android:layout_width="20dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="10dp"
+                android:button="@null"
                 android:checked="@{viewmodel.fg == PhoneColor.Green}"
                 android:onClick="@{() -> viewmodel.setFgColor(PhoneColor.Green)}"
                 android:visibility="@{viewmodel.phone instanceof NoahTwo ? View.GONE : View.VISIBLE}"
-                app:selectedColor="#2D4B0F" />
+                custom:selectedColor="@drawable/radio_green" />
         </com.xiaoliublog.pic.ui.MyRadioButtonGroup>
 
         <ProgressBar

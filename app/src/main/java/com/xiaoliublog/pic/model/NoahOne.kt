@@ -10,6 +10,7 @@ class NoahOne(override var context: Context) : Phone(context) {
         get() {
             return when (getDeviceName()) {
                 "OS105",
+                "OC105",
                 "OE106" -> mutableMapOf(
                         PhoneColor.Black to R.drawable.noah1_pro2_black,
                         PhoneColor.Green to R.drawable.noah1_pro2_green,

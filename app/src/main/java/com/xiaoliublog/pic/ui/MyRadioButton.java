@@ -4,24 +4,20 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Paint;
-import android.graphics.Shader;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatRadioButton;
 
-import com.xiaoliublog.pic.BackgroundColor;
 import com.xiaoliublog.pic.R;
 
 public class MyRadioButton extends AppCompatRadioButton {
-    private Paint mPaint = new Paint();
-    private Paint borderPaint = new Paint();
-    private int selectedColor = Color.WHITE;
+    private static final String TAG = "hyl-radio";
+    private Drawable selectedColor;
     private int shapeFlag = 0;
-    private float mPadding = 1;
+    private int mPadding = 1;
 
     public MyRadioButton(Context context) {
         super(context);
@@ -31,7 +27,7 @@ public class MyRadioButton extends AppCompatRadioButton {
     public MyRadioButton(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MyRadioButton);
-        selectedColor = typedArray.getColor(R.styleable.MyRadioButton_selectedColor, Color.WHITE);
+        selectedColor = typedArray.getDrawable(R.styleable.MyRadioButton_selectedColor);
         shapeFlag = typedArray.getColor(R.styleable.MyRadioButton_shape, 0);
         typedArray.recycle();
         init();
@@ -40,29 +36,23 @@ public class MyRadioButton extends AppCompatRadioButton {
     public MyRadioButton(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MyRadioButton);
-        selectedColor = typedArray.getColor(R.styleable.MyRadioButton_selectedColor, Color.WHITE);
+        selectedColor = typedArray.getDrawable(R.styleable.MyRadioButton_selectedColor);
         shapeFlag = typedArray.getColor(R.styleable.MyRadioButton_shape, 0);
         typedArray.recycle();
         init();
     }
 
+
     private void init() {
-        Shader shader = new LinearGradient(getWidth() / 2f, 0, getWidth() / 2f, getHeight(), selectedColor, BackgroundColor.White, Shader.TileMode.CLAMP);
-        mPaint.setShader(shader);
-        mPaint.setColor(selectedColor);
-        borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setColor(Color.WHITE);
-        borderPaint.setStrokeWidth(4);
-        borderPaint.setAntiAlias(true);
     }
 
     @Override
     public void setChecked(boolean checked) {
         ValueAnimator animator = ValueAnimator
-                .ofFloat(checked ? 5 : 1, checked ? 1 : 5)
+                .ofInt(checked ? 5 : 1, checked ? 1 : 5)
                 .setDuration(200);
         animator.addUpdateListener(animation -> {
-            mPadding = (float) animation.getAnimatedValue();
+            mPadding = (int) animation.getAnimatedValue();
             postInvalidate();
         });
         animator.start();
@@ -71,14 +61,16 @@ public class MyRadioButton extends AppCompatRadioButton {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        mPaint.setStrokeWidth(2f);
+        super.onDraw(canvas);
+        Log.d(TAG, "onDraw: " + getLeft() + "," + getTop() + "," + getRight() + "," + getBottom() + ". Bounds" + selectedColor.getBounds());
         if (shapeFlag == 0) {
-            canvas.drawRoundRect(mPadding, mPadding * 2, getWidth() - mPadding, getHeight() - mPadding * 2, 15 - mPadding, 15 - mPadding, mPaint);
-            canvas.drawRoundRect(mPadding, mPadding * 2, getWidth() - mPadding, getHeight() - mPadding * 2, 15 - mPadding, 15 - mPadding, borderPaint);
+            selectedColor.setBounds(mPadding, mPadding, getWidth() - mPadding, getHeight() - mPadding);
+            selectedColor.draw(canvas);
         } else {
-            canvas.drawCircle(getWidth() / 2f, getHeight() / 2f, (getWidth() - mPadding) / 2f - 2, mPaint);
-            canvas.drawCircle(getWidth() / 2f, getHeight() / 2f, (getWidth() - mPadding) / 2f - 2, borderPaint);
+            selectedColor.setBounds(0, 0, getWidth(), getHeight());
+            selectedColor.draw(canvas);
         }
+
     }
 
 }

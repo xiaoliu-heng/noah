@@ -8,6 +8,7 @@ class NoahTwo(override var context: Context) : Phone(context) {
     override val colors: MutableMap<PhoneColor, Int?>
         get() {
             return when (getDeviceName()) {
+                "OC105",
                 "OS105",
                 "OE106" -> mutableMapOf(
                         PhoneColor.Black to R.drawable.noah2_pro2_black_black,
@@ -20,6 +21,13 @@ class NoahTwo(override var context: Context) : Phone(context) {
                         PhoneColor.White to R.drawable.noah2_r1_white_white,
                         PhoneColor.BlackOnWhite to R.drawable.noah2_r1_black_white,
                         PhoneColor.WhiteOnBlack to R.drawable.noah2_r1_white_black
+                )
+                "DT1902A",
+                "DT1901A" -> mutableMapOf(
+                        PhoneColor.Black to R.drawable.noah2_pro3_black_black,
+                        PhoneColor.White to R.drawable.noah2_pro3_white_white,
+                        PhoneColor.BlackOnWhite to R.drawable.noah2_pro3_black_white,
+                        PhoneColor.WhiteOnBlack to R.drawable.noah2_pro3_white_black
                 )
                 else -> mutableMapOf(
                         PhoneColor.Black to R.drawable.noah2_pro3_black_black,

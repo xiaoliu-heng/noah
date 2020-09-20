@@ -27,7 +27,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     private var aspect = 1.86f
 
     val loading = MutableLiveData<Boolean>(true)
-    val isPro3 = MutableLiveData(getDeviceName() == "OC105")
+    val isPro3 = MutableLiveData(getDeviceName() == "DT1902A" || getDeviceName() == "DT1091A")
     private val _result = MutableLiveData<Bitmap>()
     private val content = MutableLiveData<Bitmap?>()
     val bg = MutableLiveData(BackgroundColor.White)

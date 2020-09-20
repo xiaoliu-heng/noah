@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Parcelable
 import android.provider.OpenableColumns
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.TextureView
 import android.view.View
@@ -41,7 +42,6 @@ import java.io.IOException
 import java.util.*
 import kotlin.concurrent.timerTask
 
-
 class MainActivity : AppCompatActivity() {
 
     private val disposable = CompositeDisposable()
@@ -62,6 +62,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val height: Int = displayMetrics.heightPixels
+        val width: Int = displayMetrics.widthPixels
 
         _model = ViewModelProvider(this).get(MainActivityViewModel::class.java)
 
@@ -78,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         frameAnimation = FrameAnimation(splashView)
         frameAnimation.setRepeatMode(RepeatMode.ONCE)
         frameAnimation.freezeLastFrame(true)
+
         frameAnimation.setScaleType(FrameAnimation.ScaleType.FIT_XY)
         frameAnimation.setFrameInterval(33)
 
@@ -101,7 +106,7 @@ class MainActivity : AppCompatActivity() {
             if (sharedPreferences.getBoolean("firstRun", true)) {
                 frameAnimation.playAnimationFromAssets("splash2")
                 Timer("hide splash first", false)
-                        .schedule(timerTask { runOnUiThread { splashFirst.visibility = View.GONE } }, 200)
+                        .schedule(timerTask { runOnUiThread { splashFirst.setImageResource(R.drawable.bg_white) } }, 200)
                 sharedPreferences.edit {
                     putBoolean("firstRun", false)
                     commit()
@@ -127,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
 
         model.bg.observe(this, Observer { t -> model.reRender() })
-        model.result.observe(this, Observer { res -> canvas?.setImageBitmap(res) })
+        model.result.observe(this, Observer { res -> canvas.setImageBitmap(res) })
 
         val intent = intent
         val action = intent.action
@@ -264,7 +269,7 @@ class MainActivity : AppCompatActivity() {
                 if (fileName.startsWith("Screenshot")) {
                     setBitmapFromUri(uri)
                 } else {
-                    Toast.makeText(this, "(oﾟvﾟ)ノ 只支持屏幕截图哦", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "(oﾟvﾟ)ノ 只支持屏幕截图哦,你选的是 $fileName", Toast.LENGTH_LONG).show()
                 }
             }
         }
