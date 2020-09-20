@@ -266,7 +266,9 @@ class MainActivity : AppCompatActivity() {
             resultData?.data?.also { uri ->
                 Log.i(TAG, "Uri: $uri")
                 val fileName = getFileName(uri)
-                if (fileName.startsWith("Screenshot")) {
+                if (getDeviceName() === "DT1902A") {
+                    setBitmapFromUri(uri)
+                } else if (fileName.toLowerCase().contains("screenshot")) {
                     setBitmapFromUri(uri)
                 } else {
                     Toast.makeText(this, "(oﾟvﾟ)ノ 只支持屏幕截图哦,你选的是 $fileName", Toast.LENGTH_LONG).show()
