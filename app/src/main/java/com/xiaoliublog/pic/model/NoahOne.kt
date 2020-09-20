@@ -42,6 +42,7 @@ class NoahOne(override var context: Context) : Phone(context) {
         get() {
             return when (getDeviceName()) {
                 "OS105",
+                "OC105",
                 "OE106" -> 706f
                 "DE106" -> 676f
                 else -> 700f
@@ -52,6 +53,7 @@ class NoahOne(override var context: Context) : Phone(context) {
         get() {
             return when (getDeviceName()) {
                 "OS105",
+                "OC105",
                 "OE106" -> 463f
                 "DE106" -> 463f
                 else -> 463f

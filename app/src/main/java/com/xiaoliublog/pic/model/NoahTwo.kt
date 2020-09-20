@@ -42,6 +42,7 @@ class NoahTwo(override var context: Context) : Phone(context) {
         get() {
             return when (getDeviceName()) {
                 "OS105",
+                "OC105",
                 "OE106" -> 790f
                 "DE106" -> 750f
                 else -> 780f
